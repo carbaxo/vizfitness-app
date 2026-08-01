@@ -27,6 +27,14 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
 - **🏋️ Gimnasio** — sesión en vivo con cronómetro, series con peso y
   repeticiones, temporizador de descanso con aviso sonoro y vibración, y
   volumen total de la sesión.
+- **🔥 Circuitos por estaciones** — entrenamiento tipo **WOD o Hyrox en casa**:
+  recorres una lista de estaciones con un tiempo fijo de trabajo, **tiempo de
+  transición entre una y otra** y varias rondas. El cronómetro avisa con
+  sonido y vibración en cada cambio, canta la cuenta atrás de los últimos tres
+  segundos y mantiene la pantalla encendida. Seis circuitos listos —Hyrox en
+  casa, WOD exprés, Tabata y tres **con bandas elásticas, cortas y largas**—,
+  con rondas y tiempos ajustables, y puedes quitar las estaciones cuyo
+  material no tengas.
 - **🗓️ Planes de entrenamiento** — crea tu rutina semanal (días de gimnasio,
   cardio y descanso) e inicia cada sesión con un toque: los ejercicios y las
   series se precargan solos. Incluye **plantillas de rutinas prediseñadas**

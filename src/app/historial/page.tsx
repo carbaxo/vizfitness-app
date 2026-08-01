@@ -15,7 +15,7 @@ export default function HistorialPage() {
 
 function Historial() {
   const { data: workouts, loading } = useWorkouts();
-  const [filter, setFilter] = useState<"todos" | "gym" | "cardio">("todos");
+  const [filter, setFilter] = useState<"todos" | "gym" | "circuito" | "cardio">("todos");
 
   const filtered = workouts.filter((w) => filter === "todos" || w.type === filter);
 
@@ -23,11 +23,12 @@ function Historial() {
     <div className="space-y-5">
       <h1 className="text-2xl font-bold">Historial</h1>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         {(
           [
             ["todos", "Todos"],
             ["gym", "🏋️ Gimnasio"],
+            ["circuito", "🔥 Estaciones"],
             ["cardio", "🏃 Cardio"],
           ] as const
         ).map(([value, label]) => (

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Workout } from "@/lib/types";
-import { CARDIO_SPORTS } from "@/lib/types";
+import { CARDIO_SPORTS, STATION_EQUIPMENT } from "@/lib/types";
 import { formatDateShort, formatDuration, pace } from "@/lib/stats";
 import { useAuth } from "@/context/AuthContext";
 import { deleteWorkout } from "@/lib/db";
@@ -12,6 +12,7 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const isCardio = workout.type === "cardio";
+  const isCircuit = workout.type === "circuito";
   const sport = CARDIO_SPORTS.find((s) => s.value === workout.cardio?.sport);
 
   const remove = async () => {
@@ -29,10 +30,10 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
         <div className="flex items-start gap-3">
           <span
             className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-2xl ${
-              isCardio ? "bg-cardio/12" : "bg-gym/12"
+              isCardio ? "bg-cardio/12" : isCircuit ? "bg-accent/12" : "bg-gym/12"
             }`}
           >
-            {isCardio ? sport?.emoji ?? "🏃" : "🏋️"}
+            {isCardio ? (sport?.emoji ?? "🏃") : isCircuit ? "🔥" : "🏋️"}
           </span>
           <div>
             <p className="font-semibold">{workout.name}</p>
@@ -51,10 +52,14 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
         <div className="flex shrink-0 items-center gap-2">
           <span
             className={`chip ${
-              isCardio ? "bg-cardio/15 text-cardio" : "bg-gym/15 text-gym"
+              isCardio
+                ? "bg-cardio/15 text-cardio"
+                : isCircuit
+                  ? "bg-accent/15 text-accent"
+                  : "bg-gym/15 text-gym"
             }`}
           >
-            {isCardio ? "Cardio" : "Gimnasio"}
+            {isCardio ? "Cardio" : isCircuit ? "Estaciones" : "Gimnasio"}
           </span>
           <span
             className={`text-slate-500 transition-transform duration-300 ease-silk ${
@@ -74,6 +79,14 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
             <span>⚡ {pace(workout.durationMin, workout.cardio.distanceKm)}</span>
             {workout.cardio.avgHr ? <span>❤️ {workout.cardio.avgHr} ppm</span> : null}
             {workout.cardio.calories ? <span>🔥 {workout.cardio.calories} kcal</span> : null}
+          </>
+        ) : isCircuit && workout.circuit ? (
+          <>
+            <span>🎯 {workout.circuit.stations.length} estaciones</span>
+            <span>
+              🔁 {workout.circuit.rounds}/{workout.circuit.plannedRounds} rondas
+            </span>
+            <span>⏱ {Math.round(workout.circuit.workSec / 60)} min de trabajo</span>
           </>
         ) : (
           <>
@@ -95,7 +108,23 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
               <RouteMap route={workout.cardio!.route!} />
             </div>
           )}
-          {!isCardio && workout.exercises && (
+          {isCircuit && workout.circuit && (
+            <ul className="space-y-1.5 text-sm">
+              {workout.circuit.stations.map((st, i) => {
+                const eq = STATION_EQUIPMENT.find((e) => e.value === st.equipment);
+                return (
+                  <li key={i} className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">{i + 1}.</span>
+                    <span className="min-w-0 flex-1 truncate text-slate-200">{st.name}</span>
+                    <span className="shrink-0 text-xs text-slate-500">
+                      {eq?.emoji} {eq?.label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {!isCardio && !isCircuit && workout.exercises && (
             <ul className="space-y-2 text-sm">
               {workout.exercises.map((ex, i) => (
                 <li key={i}>
