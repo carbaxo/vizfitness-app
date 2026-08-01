@@ -173,14 +173,17 @@ mobile/
 
 ## 🎨 Iconos
 
-Los PNG de `assets/` no se dibujan a mano: los genera un script sin
-dependencias a partir de la geometría del logotipo, igual que en VizPlay.
+El icono de la app **es el logotipo**: VIZ en blanco y FITNESS en naranja,
+en dos líneas justificadas al mismo ancho sobre la baldosa oscura.
+
+Los PNG de `assets/` no se dibujan a mano: los genera, junto con los iconos de
+la web, un único script sin dependencias en la raíz del repositorio:
 
 ```bash
-node assets/make-icons.mjs
+node ../scripts/make-brand-assets.mjs
 ```
 
-Produce `icon.png` (la baldosa naranja con la mancuerna blanca),
-`adaptive-icon.png` (solo el glifo, para el icono adaptativo de Android, que
-pone el naranja de fondo desde `app.json`) y `splash.png`. Si cambias el
-logotipo, edita las coordenadas al principio del script y vuelve a lanzarlo.
+Produce `icon.png` (el logotipo sobre la baldosa), `adaptive-icon.png` (solo el
+logotipo, encogido a la zona segura; Android pone detrás el color de
+`adaptiveIcon.backgroundColor` del `app.json`) y `splash.png`. Ver el apartado
+de marca del [README raíz](../README.md#-marca-y-paleta).

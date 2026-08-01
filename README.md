@@ -114,6 +114,20 @@ la letra apretada. Vive en un único componente en cada app
 [`mobile/src/components/Wordmark.tsx`](./mobile/src/components/Wordmark.tsx))
 para que ninguna pantalla pueda pintarlo distinto.
 
+**El icono también es el logotipo**, en dos líneas justificadas al mismo ancho
+sobre la baldosa oscura. Las letras van como contornos vectoriales, extraídos
+de Inter Display Black —la misma tipografía con la que está hecho el logotipo
+de VizPlay—, así que ni los SVG ni el generador necesitan la fuente instalada.
+Todos los archivos de imagen salen de un solo script sin dependencias:
+
+```bash
+node scripts/make-brand-assets.mjs
+```
+
+Escribe `public/icon.svg` y `public/icon-maskable.svg` (web y PWA) y
+`mobile/assets/{icon,adaptive-icon,splash}.png` (Android). No los edites a
+mano: cambia el script y vuelve a lanzarlo.
+
 El color de marca es el naranja **`#FF6F00`**. Todo lo demás se construye
 alrededor: los neutros son **cálidos** (grises con una pizca de marrón), porque
 sobre un gris azulado el naranja se ve sucio, y el color de apoyo es un
@@ -166,6 +180,9 @@ src/
 ├── components/           # Componentes de interfaz
 ├── context/              # Contexto de autenticación
 └── lib/                  # Firebase, acceso a datos, estadísticas, tipos
+
+scripts/
+└── make-brand-assets.mjs # Genera los iconos de la web y de la app Android
 ```
 
 ## 🗺️ Ideas para el futuro
