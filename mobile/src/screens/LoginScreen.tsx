@@ -3,7 +3,7 @@ import { Alert, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { colors } from "../theme";
 import { Button, Card } from "../components/ui";
-import Wordmark from "../components/Wordmark";
+import Wordmark, { Mark } from "../components/Wordmark";
 
 export default function LoginScreen() {
   const { signInWithGoogle, configured, canSignIn } = useAuth();
@@ -26,8 +26,10 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={{ fontSize: 56 }}>💪</Text>
-      <Wordmark style={styles.title} />
+      <Mark size={92} />
+      <View style={styles.title}>
+        <Wordmark height={30} />
+      </View>
       <Text style={styles.subtitle}>
         Cardio con GPS en vivo, gimnasio, planes de entrenamiento e importación
         de Strava. Tus datos, sincronizados con la web y todos tus dispositivos.
@@ -64,7 +66,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 28,
   },
-  title: { marginTop: 10 },
+  title: { marginTop: 18 },
   subtitle: {
     color: colors.textMuted,
     textAlign: "center",

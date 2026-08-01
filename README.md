@@ -114,25 +114,41 @@ soporte Next.js.
 
 ## 🎨 Marca y paleta
 
-El logotipo es **VIZ** en blanco y **FITNESS** en naranja, en mayúsculas y con
-la letra apretada. Vive en un único componente en cada app
-([`src/components/Wordmark.tsx`](./src/components/Wordmark.tsx) y
-[`mobile/src/components/Wordmark.tsx`](./mobile/src/components/Wordmark.tsx))
-para que ninguna pantalla pueda pintarlo distinto.
+VizFitness usa **la marca de la familia Viz**, la misma construcción que
+VizPlay, VizSoccer y VizLessons:
 
-**El icono también es el logotipo**, en dos líneas justificadas al mismo ancho
-sobre la baldosa oscura. Las letras van como contornos vectoriales, extraídos
-de Inter Display Black —la misma tipografía con la que está hecho el logotipo
-de VizPlay—, así que ni los SVG ni el generador necesitan la fuente instalada.
-Todos los archivos de imagen salen de un solo script sin dependencias:
+- **El icono** es una **V de dos brazos** —el izquierdo blanco, el derecho en
+  un tono claro del color de marca— sobre un cuadrado redondeado con un
+  degradado en diagonal. Cambia el color, no la forma.
+- **El logotipo** es la palabra en letras geométricas de trazo recto, partida
+  en dos colores: **VIZ** en blanco y **FITNESS** en naranja.
+
+La geometría **se calcula, no se dibuja**: la V del icono, la V del logotipo y
+las letras salen de las mismas fórmulas y con las mismas proporciones que en
+las otras apps (`scripts/logo.py` de VizSoccer, portado aquí a Node). Por eso
+los trazados de la V y de las letras VIZ son idénticos a los de VizSoccer,
+salvo el color.
+
+Todo sale de un único script sin dependencias — ni Pillow ni librerías de
+imagen: los PNG se rasterizan y se empaquetan con `zlib`:
 
 ```bash
 node scripts/make-brand-assets.mjs
 ```
 
-Escribe `public/icon.svg` y `public/icon-maskable.svg` (web y PWA) y
-`mobile/assets/{icon,adaptive-icon,splash}.png` (Android). No los edites a
-mano: cambia el script y vuelve a lanzarlo.
+Escribe la marca suelta (`brand/logo.svg`, `brand/logo-mark.svg`,
+`brand/logo-wordmark.svg`), los iconos de la web (`public/icon.svg`,
+`public/icon-maskable.svg`), los de Android
+(`mobile/assets/{icon,adaptive-icon,adaptive-icon-bg,splash}.png`) y la
+geometría que consumen los componentes de React (`src/lib/wordmark.ts` y
+`mobile/src/lib/wordmark.ts`). **No edites nada de eso a mano**: cambia el
+script y vuelve a lanzarlo.
+
+En pantalla, la marca se pinta con `Mark`, `Wordmark` y `Logo` de
+[`src/components/Wordmark.tsx`](./src/components/Wordmark.tsx) y
+[`mobile/src/components/Wordmark.tsx`](./mobile/src/components/Wordmark.tsx),
+que leen esa misma geometría. Así el logotipo de la cabecera y el icono del
+lanzador no pueden acabar siendo distintos.
 
 El color de marca es el naranja **`#FF6F00`**. Todo lo demás se construye
 alrededor: los neutros son **cálidos** (grises con una pizca de marrón), porque
@@ -143,6 +159,8 @@ vistazo en las gráficas.
 | Uso | Color |
 | --- | --- |
 | Marca / acento | `#FF6F00` |
+| Degradado del icono | `#FFA31A` → `#5E2500` |
+| Segundo brazo de la V | `#FFCB99` |
 | Acento claro (hover, texto) | `#FFA040` |
 | Acento oscuro (pulsado) | `#C25100` |
 | Cardio | `#FF8A1F` |

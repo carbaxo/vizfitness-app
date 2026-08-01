@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
-import Wordmark from "@/components/Wordmark";
+import Wordmark, { Logo, Mark } from "@/components/Wordmark";
 
 const NAV = [
   { href: "/", label: "Inicio", icon: "🏠" },
@@ -14,23 +14,14 @@ const NAV = [
   { href: "/perfil", label: "Perfil", icon: "👤" },
 ];
 
-function Logo() {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="text-2xl">💪</span>
-      <Wordmark />
-    </div>
-  );
-}
-
 function LoginScreen() {
   const { signInWithGoogle, configured } = useAuth();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-      <div className="mb-6 text-6xl">💪</div>
-      <h1>
-        <Wordmark className="text-4xl" />
+      <Mark size={84} />
+      <h1 className="mt-6">
+        <Wordmark height={34} />
       </h1>
       <p className="mt-3 max-w-md text-slate-400">
         Registra tus entrenamientos de cardio y gimnasio, crea planes de
@@ -83,7 +74,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <div className="animate-pulse text-4xl">💪</div>
+        <div className="animate-pulse"><Mark size={56} /></div>
       </main>
     );
   }
