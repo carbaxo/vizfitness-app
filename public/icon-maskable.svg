@@ -1,13 +1,22 @@
+<!-- Variante "maskable": el sistema recorta la forma que quiera (círculo,
+     cuadrado…), así que el fondo llega hasta el borde y el glifo se encoge al
+     72 % para caber en la zona segura. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#0f1720"/>
+  <defs>
+    <linearGradient id="viz" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF9A3D"/>
+      <stop offset="1" stop-color="#E85D00"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#viz)"/>
   <g transform="translate(256 256) scale(0.72) translate(-256 -256)">
-    <g stroke="#34d399" stroke-width="34" stroke-linecap="round">
-      <line x1="120" y1="256" x2="392" y2="256"/>
-      <rect x="72" y="176" width="52" height="160" rx="16" fill="#34d399" stroke="none"/>
-      <rect x="388" y="176" width="52" height="160" rx="16" fill="#34d399" stroke="none"/>
-      <rect x="34" y="210" width="34" height="92" rx="12" fill="#059669" stroke="none"/>
-      <rect x="444" y="210" width="34" height="92" rx="12" fill="#059669" stroke="none"/>
+    <g fill="#ffffff">
+      <rect x="120" y="222" width="272" height="36" rx="18"/>
+      <rect x="96" y="166" width="52" height="148" rx="18"/>
+      <rect x="364" y="166" width="52" height="148" rx="18"/>
+      <rect x="58" y="200" width="34" height="80" rx="14" opacity=".85"/>
+      <rect x="420" y="200" width="34" height="80" rx="14" opacity=".85"/>
     </g>
-    <path d="M150 392 q 40 -36 76 0 t 76 0 t 76 0" fill="none" stroke="#f97316" stroke-width="22" stroke-linecap="round"/>
+    <path d="M120 378 q 40 -36 76 0 t 76 0 t 76 0" fill="none" stroke="#12100E" stroke-width="22" stroke-linecap="round" opacity=".8"/>
   </g>
 </svg>

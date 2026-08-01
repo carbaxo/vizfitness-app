@@ -133,13 +133,15 @@ export default function RouteMap({
           <polyline
             points={pts.map((p) => `${p.x},${p.y}`).join(" ")}
             fill="none"
-            stroke="#f97316"
+            stroke="#FF6F00"
             strokeWidth={3.5}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
-          <circle cx={start.x} cy={start.y} r={6} fill="#34d399" stroke="#ffffff" strokeWidth={2} />
-          <circle cx={end.x} cy={end.y} r={6} fill="#f87171" stroke="#ffffff" strokeWidth={2} />
+          {/* Salida en turquesa y llegada en rojo: los dos extremos se
+              distinguen del naranja del recorrido. */}
+          <circle cx={start.x} cy={start.y} r={6} fill="#2DC5C9" stroke="#ffffff" strokeWidth={2} />
+          <circle cx={end.x} cy={end.y} r={6} fill="#F4685E" stroke="#ffffff" strokeWidth={2} />
         </svg>
         {/* Atribución requerida por la política de OpenStreetMap */}
         <a

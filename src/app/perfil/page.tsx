@@ -57,7 +57,7 @@ function Perfil() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `rcv-tracker-export-${isoDate(new Date())}.json`;
+    a.download = `vizfitness-export-${isoDate(new Date())}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

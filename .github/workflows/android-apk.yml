@@ -21,7 +21,7 @@ name: Compilar APK de Android
 on:
   workflow_dispatch:
   push:
-    branches: [main, claude/fitness-tracking-app-j8l3ci]
+    branches: [main, claude/vizfitness-branding-colors-c66dm8]
     paths: ["mobile/**", ".github/workflows/android-apk.yml"]
 
 permissions:
@@ -99,7 +99,7 @@ jobs:
               -keystore android/app/debug.keystore \
               -alias androiddebugkey -storepass android -keypass android \
               -keyalg RSA -keysize 2048 -validity 10950 \
-              -dname "CN=RCV Tracker, OU=Personal, O=RCV, L=ES, C=ES"
+              -dname "CN=VizFitness, OU=Personal, O=VizFitness, L=ES, C=ES"
             echo "generated=true" >> "$GITHUB_OUTPUT"
           fi
           echo "## Huella del keystore (para el cliente OAuth Android de Google)" >> "$GITHUB_STEP_SUMMARY"
@@ -124,7 +124,7 @@ jobs:
       - name: Publicar la APK como artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: rcv-tracker-apk
+          name: vizfitness-apk
           path: mobile/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
 
@@ -135,9 +135,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp android/app/build/outputs/apk/release/app-release.apk rcv-tracker.apk
-          gh release create "v1.0.${{ github.run_number }}" rcv-tracker.apk \
-            --title "RCV Tracker v1.0.${{ github.run_number }}" \
+          cp android/app/build/outputs/apk/release/app-release.apk vizfitness.apk
+          gh release create "v1.0.${{ github.run_number }}" vizfitness.apk \
+            --title "VizFitness v1.0.${{ github.run_number }}" \
             --notes "APK de Android firmada, generada automáticamente por GitHub Actions (run #${{ github.run_number }})." \
             --latest
 

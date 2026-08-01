@@ -1,4 +1,4 @@
-# 💪 RCV Tracker
+# 💪 VizFitness
 
 Aplicación de seguimiento de entrenamiento estilo Strava, pero completa:
 **cardio + gimnasio + planes de entrenamiento**, con inicio de sesión con
@@ -76,8 +76,8 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
 ### 3. Configurar y arrancar la aplicación
 
 ```bash
-git clone https://github.com/carbaxo/rcv_tracker.git
-cd rcv_tracker
+git clone https://github.com/carbaxo/vizfitness-app.git
+cd vizfitness-app
 npm install
 npm run dev
 ```
@@ -105,6 +105,41 @@ La forma más sencilla es [Vercel](https://vercel.com):
 
 También funciona en Netlify, Firebase Hosting o cualquier plataforma que
 soporte Next.js.
+
+## 🎨 Marca y paleta
+
+El logotipo es **VIZ** en blanco y **FITNESS** en naranja, en mayúsculas y con
+la letra apretada. Vive en un único componente en cada app
+([`src/components/Wordmark.tsx`](./src/components/Wordmark.tsx) y
+[`mobile/src/components/Wordmark.tsx`](./mobile/src/components/Wordmark.tsx))
+para que ninguna pantalla pueda pintarlo distinto.
+
+El color de marca es el naranja **`#FF6F00`**. Todo lo demás se construye
+alrededor: los neutros son **cálidos** (grises con una pizca de marrón), porque
+sobre un gris azulado el naranja se ve sucio, y el color de apoyo es un
+**turquesa**, el complementario, que es lo que separa cardio de gimnasio de un
+vistazo en las gráficas.
+
+| Uso | Color |
+| --- | --- |
+| Marca / acento | `#FF6F00` |
+| Acento claro (hover, texto) | `#FFA040` |
+| Acento oscuro (pulsado) | `#C25100` |
+| Cardio | `#FF8A1F` |
+| Gimnasio | `#2DC5C9` |
+| Fondo | `#12100E` |
+| Tarjetas | `#1B1714` |
+| Bordes | `#332A23` |
+| Texto | `#F6F2EE` |
+| Texto secundario | `#A79B8D` |
+| Correcto / Aviso / Error | `#3DD68C` · `#FFC53D` · `#F4685E` |
+
+Los botones principales van con **texto oscuro sobre naranja**: el blanco sobre
+`#FF6F00` no llega al contraste mínimo de accesibilidad (2,8:1), el oscuro sí
+(6,8:1).
+
+Se definen en un solo sitio por app: [`tailwind.config.ts`](./tailwind.config.ts)
+en la web y [`mobile/src/theme.ts`](./mobile/src/theme.ts) en Android.
 
 ## 🧱 Tecnologías
 

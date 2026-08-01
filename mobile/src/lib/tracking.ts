@@ -12,7 +12,7 @@ import type { CardioSport, RoutePoint } from "./types";
 // AsyncStorage y la interfaz la lee periódicamente, de modo que la grabación
 // sobrevive incluso si Android mata el proceso de la app.
 
-export const GPS_TASK = "rcv-gps-tracking";
+export const GPS_TASK = "vizfitness-gps-tracking";
 const SESSION_KEY = "gps_session_v1";
 const AUTO_PAUSE_PREF_KEY = "gps_autopause_pref";
 
@@ -208,9 +208,9 @@ export async function startTracking(
     distanceInterval: 5,
     // Servicio en primer plano: mantiene el GPS vivo con la pantalla apagada
     foregroundService: {
-      notificationTitle: "RCV Tracker — grabando ruta",
+      notificationTitle: "VizFitness — grabando ruta",
       notificationBody: "Tu actividad sigue grabándose. Toca para volver a la app.",
-      notificationColor: "#34d399",
+      notificationColor: "#FF6F00",
       killServiceOnDestroy: false,
     },
     pausesUpdatesAutomatically: false,

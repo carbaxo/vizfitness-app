@@ -22,24 +22,24 @@ export default function ProgressChart({ data }: { data: Point[] }) {
         <LineChart data={data} margin={{ top: 5, right: 5, bottom: 0, left: -20 }}>
           <XAxis
             dataKey="label"
-            tick={{ fill: "#94a3b8", fontSize: 11 }}
-            axisLine={{ stroke: "#1f2e3f" }}
+            tick={{ fill: "#A79B8D", fontSize: 11 }}
+            axisLine={{ stroke: "#332A23" }}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: "#94a3b8", fontSize: 11 }}
+            tick={{ fill: "#A79B8D", fontSize: 11 }}
             axisLine={false}
             tickLine={false}
             domain={["auto", "auto"]}
           />
           <Tooltip
             contentStyle={{
-              background: "#16212e",
-              border: "1px solid #2b3d52",
+              background: "#251F1A",
+              border: "1px solid #463A30",
               borderRadius: 12,
               fontSize: 12,
             }}
-            labelStyle={{ color: "#e2e8f0" }}
+            labelStyle={{ color: "#E8E1D9" }}
             formatter={(value: number, name: string) => [
               `${value} kg`,
               name === "peso" ? "Mejor peso" : "1RM estimado",
@@ -47,13 +47,13 @@ export default function ProgressChart({ data }: { data: Point[] }) {
           />
           <Line
             dataKey="peso"
-            stroke="#34d399"
+            stroke="#FF6F00"
             strokeWidth={2.5}
-            dot={{ fill: "#34d399", r: 3 }}
+            dot={{ fill: "#FF6F00", r: 3 }}
           />
           <Line
             dataKey="rm"
-            stroke="#38bdf8"
+            stroke="#2DC5C9"
             strokeWidth={2}
             strokeDasharray="5 4"
             dot={false}
