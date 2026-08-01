@@ -92,15 +92,78 @@ export interface CardioData {
   route?: RoutePoint[];
 }
 
+// ------------------------------- circuitos por estaciones (WOD / Hyrox) ----
+
+/** Material de una estación. Las bandas van separadas porque no se usan igual:
+ *  la corta (mini band, un aro cerrado) es de tren inferior y activación; la
+ *  larga (tubo o cinta larga, con o sin anclaje) sustituye a poleas y remo. */
+export type StationEquipment =
+  | "peso corporal"
+  | "banda corta"
+  | "banda larga"
+  | "mancuerna"
+  | "kettlebell"
+  | "comba"
+  | "mochila"
+  | "esterilla";
+
+export const STATION_EQUIPMENT: {
+  value: StationEquipment;
+  label: string;
+  emoji: string;
+}[] = [
+  { value: "peso corporal", label: "Peso corporal", emoji: "🤸" },
+  { value: "banda corta", label: "Banda corta", emoji: "⭕" },
+  { value: "banda larga", label: "Banda larga", emoji: "🎗️" },
+  { value: "mancuerna", label: "Mancuernas", emoji: "🏋️" },
+  { value: "kettlebell", label: "Kettlebell", emoji: "🔔" },
+  { value: "comba", label: "Comba", emoji: "🪢" },
+  { value: "mochila", label: "Mochila lastrada", emoji: "🎒" },
+  { value: "esterilla", label: "Esterilla", emoji: "🧘" },
+];
+
+export interface CircuitStation {
+  name: string;
+  equipment: StationEquipment;
+  /** Duración de la estación. Si hay `reps`, el tiempo es solo el tope. */
+  workSec: number;
+  reps?: string;
+  /** Cómo montarla o en qué fijarse: anclaje de la banda, tempo, postura… */
+  note?: string;
+}
+
+export interface Circuit {
+  name: string;
+  emoji: string;
+  description: string;
+  stations: CircuitStation[];
+  /** Tiempo entre estaciones: lo que tardas en cambiar de sitio y de material. */
+  transitionSec: number;
+  rounds: number;
+  roundRestSec: number;
+}
+
+/** Lo que queda guardado de un circuito ya hecho. */
+export interface CircuitData {
+  stations: { name: string; equipment: StationEquipment }[];
+  /** Rondas completadas y rondas que tenía el circuito. */
+  rounds: number;
+  plannedRounds: number;
+  transitionSec: number;
+  /** Segundos de trabajo puro, sin transiciones ni descansos. */
+  workSec: number;
+}
+
 export interface Workout {
   id?: string;
-  type: "gym" | "cardio";
+  type: "gym" | "cardio" | "circuito";
   name: string;
   date: string; // ISO yyyy-mm-dd
   durationMin: number;
   notes?: string;
   exercises?: WorkoutExercise[];
   cardio?: CardioData;
+  circuit?: CircuitData;
   volumeKg?: number;
   // ID de la actividad original si se importó desde Strava (evita duplicados)
   stravaId?: number;
