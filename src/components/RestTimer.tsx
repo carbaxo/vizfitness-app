@@ -50,7 +50,7 @@ export default function RestTimer() {
       <span className="text-sm font-semibold text-slate-300">⏱️ Descanso</span>
       <span
         className={`min-w-[76px] text-[26px] font-bold tracking-tightest tabular-nums transition-colors ${
-          running ? "text-accent drop-shadow-[0_0_10px_rgba(52,211,153,0.5)]" : "text-slate-500"
+          running ? "text-accent drop-shadow-[0_0_10px_rgba(255,111,0,0.5)]" : "text-slate-500"
         }`}
       >
         {mm}:{ss}

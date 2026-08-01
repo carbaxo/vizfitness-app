@@ -1,4 +1,4 @@
-# 📱 RCV Tracker — App Android
+# 📱 VizFitness — App Android
 
 App nativa de Android (React Native + Expo) que comparte cuenta y datos con
 la versión web: inicias sesión con la misma cuenta de Google y todo se
@@ -63,6 +63,20 @@ lo que solo un móvil puede hacer: GPS e importación cómoda.
 
 ## 🚀 Puesta en marcha
 
+> ⚠️ **La app cambió de identificador**: antes era `com.rcv.tracker` y ahora es
+> `com.viz.fitness` (y el esquema de enlaces pasó de `rcvtracker` a
+> `vizfitness`). Para Android es una app **nueva**, así que:
+>
+> - hay que **desinstalar** la versión anterior antes de instalar la nueva;
+> - hay que crear un **cliente OAuth de Android nuevo** en Google Cloud con el
+>   paquete `com.viz.fitness` y la misma SHA-1, y actualizar el secreto
+>   `GOOGLE_ANDROID_CLIENT_ID` (si no, el botón de Google no funcionará);
+> - hay que cambiar el "Authorization Callback Domain" de la app de Strava a
+>   `vizfitness`.
+>
+> Los datos no se pierden: viven en Firestore ligados a la cuenta de Google, y
+> el proyecto de Firebase es el mismo.
+
 ### 1. Variables de entorno
 
 ```bash
@@ -81,12 +95,12 @@ Rellena en `.env`:
    - `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`: el cliente OAuth de tipo **Web** que
      Firebase creó automáticamente al habilitar Google en Authentication.
    - `EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID`: crea un cliente OAuth de tipo
-     **Android** con el paquete `com.rcv.tracker` y la huella **SHA-1** de tu
+     **Android** con el paquete `com.viz.fitness` y la huella **SHA-1** de tu
      keystore (`cd android && ./gradlew signingReport`, o la que te da EAS).
 3. **Strava**: crea una app gratuita en
    [strava.com/settings/api](https://www.strava.com/settings/api) y copia
    `EXPO_PUBLIC_STRAVA_CLIENT_ID` y `EXPO_PUBLIC_STRAVA_CLIENT_SECRET`. En
-   "Authorization Callback Domain" pon `rcvtracker` (el esquema de la app).
+   "Authorization Callback Domain" pon `vizfitness` (el esquema de la app).
 
 ### 2. Ejecutar en desarrollo
 
@@ -151,6 +165,25 @@ mobile/
 │   │   ├── geo.ts           # Haversine, decodificador de polylines, ritmo
 │   │   └── types.ts         # Modelo de datos compartido con la web
 │   ├── screens/             # Inicio, GPS, Strava, Perfil, Login
-│   └── components/          # RouteTrace (SVG), UI base
+│   ├── components/          # RouteTrace (SVG), UI base, logotipo
+│   └── theme.ts             # Paleta de VizFitness (la misma que la web)
+├── assets/                  # Iconos de la app (ver abajo)
 └── app.json                 # Config Expo (permisos de ubicación, esquema OAuth)
 ```
+
+## 🎨 Iconos
+
+El icono de la app **es el logotipo**: VIZ en blanco y FITNESS en naranja,
+en dos líneas justificadas al mismo ancho sobre la baldosa oscura.
+
+Los PNG de `assets/` no se dibujan a mano: los genera, junto con los iconos de
+la web, un único script sin dependencias en la raíz del repositorio:
+
+```bash
+node ../scripts/make-brand-assets.mjs
+```
+
+Produce `icon.png` (el logotipo sobre la baldosa), `adaptive-icon.png` (solo el
+logotipo, encogido a la zona segura; Android pone detrás el color de
+`adaptiveIcon.backgroundColor` del `app.json`) y `splash.png`. Ver el apartado
+de marca del [README raíz](../README.md#-marca-y-paleta).

@@ -107,9 +107,9 @@ const styles = StyleSheet.create({
     borderColor: colors.inputBorder,
   },
   btnDanger: {
-    backgroundColor: "rgba(248,113,113,0.08)",
+    backgroundColor: "rgba(244,104,94,0.10)",
     borderWidth: 1,
-    borderColor: "rgba(248,113,113,0.4)",
+    borderColor: "rgba(244,104,94,0.45)",
   },
   btnText: { fontWeight: "700", fontSize: 15 },
 });

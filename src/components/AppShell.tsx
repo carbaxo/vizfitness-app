@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
+import Wordmark from "@/components/Wordmark";
 
 const NAV = [
   { href: "/", label: "Inicio", icon: "🏠" },
@@ -17,9 +18,7 @@ function Logo() {
   return (
     <div className="flex items-center gap-2">
       <span className="text-2xl">💪</span>
-      <span className="text-lg font-bold tracking-tight">
-        RCV <span className="text-accent">Tracker</span>
-      </span>
+      <Wordmark />
     </div>
   );
 }
@@ -30,8 +29,8 @@ function LoginScreen() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
       <div className="mb-6 text-6xl">💪</div>
-      <h1 className="text-3xl font-bold">
-        RCV <span className="text-accent">Tracker</span>
+      <h1>
+        <Wordmark className="text-4xl" />
       </h1>
       <p className="mt-3 max-w-md text-slate-400">
         Registra tus entrenamientos de cardio y gimnasio, crea planes de

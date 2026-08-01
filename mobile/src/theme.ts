@@ -1,15 +1,25 @@
+/**
+ * Paleta de VizFitness (la misma que la web, en tailwind.config.ts).
+ *
+ * Marca: naranja #FF6F00. Los neutros son cálidos a propósito —sobre un gris
+ * azulado el naranja se ve sucio— y el color de apoyo es un turquesa, el
+ * complementario, que es lo que separa cardio de gimnasio de un vistazo.
+ */
 export const colors = {
-  bg: "#0a0f14",
-  card: "#0f1720",
-  cardBorder: "#1f2e3f",
-  input: "#16212e",
-  inputBorder: "#2b3d52",
-  text: "#f1f5f9",
-  textMuted: "#94a3b8",
-  textFaint: "#64748b",
-  accent: "#34d399",
-  accentDark: "#059669",
-  cardio: "#f97316",
-  gym: "#38bdf8",
-  danger: "#f87171",
+  bg: "#12100E",
+  card: "#1B1714",
+  cardBorder: "#332A23",
+  input: "#251F1A",
+  inputBorder: "#463A30",
+  text: "#F6F2EE",
+  textMuted: "#A79B8D",
+  textFaint: "#87796B",
+  accent: "#FF6F00",
+  accentDark: "#C25100",
+  accentSoft: "#FFA040",
+  cardio: "#FF8A1F",
+  gym: "#2DC5C9",
+  ok: "#3DD68C",
+  warn: "#FFC53D",
+  danger: "#F4685E",
 };

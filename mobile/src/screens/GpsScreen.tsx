@@ -88,7 +88,7 @@ export default function GpsScreen() {
       if (!mode) {
         Alert.alert(
           "Permiso necesario",
-          "RCV Tracker necesita acceso a tu ubicación para grabar la ruta."
+          "VizFitness necesita acceso a tu ubicación para grabar la ruta."
         );
         return;
       }
@@ -96,7 +96,7 @@ export default function GpsScreen() {
       if (mode === "foreground") {
         Alert.alert(
           "Grabación limitada",
-          "Sin el permiso «Permitir siempre», la ruta solo se graba con la app en pantalla. Puedes cambiarlo en Ajustes → Aplicaciones → RCV Tracker → Ubicación."
+          "Sin el permiso «Permitir siempre», la ruta solo se graba con la app en pantalla. Puedes cambiarlo en Ajustes → Aplicaciones → VizFitness → Ubicación."
         );
       }
       setSession(null);
@@ -239,7 +239,7 @@ export default function GpsScreen() {
             </View>
             <Text
               style={{
-                color: session && isAutoPaused(session) ? "#fbbf24" : colors.textFaint,
+                color: session && isAutoPaused(session) ? colors.warn : colors.textFaint,
                 fontSize: 12,
                 textAlign: "center",
               }}

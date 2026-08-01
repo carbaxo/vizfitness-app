@@ -1,5 +1,5 @@
 # Publica la web (Next.js exportada como estático) en GitHub Pages.
-# URL resultante: https://carbaxo.github.io/rcv_tracker/
+# URL resultante: https://carbaxo.github.io/vizfitness-app/
 #
 # Método: publica la carpeta exportada `out/` en la rama `gh-pages`. Es más
 # robusto que el despliegue nativo por entorno y no depende de reglas de
@@ -52,7 +52,7 @@ jobs:
 
       - name: Compilar la web (exportación estática)
         env:
-          NEXT_PUBLIC_BASE_PATH: /rcv_tracker
+          NEXT_PUBLIC_BASE_PATH: /vizfitness-app
         run: npx next build
 
       - name: Evitar el procesado de Jekyll (necesario para la carpeta _next)

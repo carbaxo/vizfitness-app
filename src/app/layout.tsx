@@ -3,19 +3,19 @@ import { AuthProvider } from "@/context/AuthContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "RCV Tracker · Tu entrenamiento, sincronizado",
+  title: "VizFitness · Tu entrenamiento, sincronizado",
   description:
     "Registra cardio y gimnasio, crea planes de entrenamiento y sigue tu progreso desde cualquier dispositivo.",
   manifest: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/manifest.json`,
   appleWebApp: {
     capable: true,
-    title: "RCV Tracker",
+    title: "VizFitness",
     statusBarStyle: "black-translucent",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080b10",
+  themeColor: "#12100E",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

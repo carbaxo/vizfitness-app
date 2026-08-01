@@ -111,7 +111,7 @@ export default function WatchScreen() {
 
       {!moduleOk ? (
         <Card>
-          <Text style={{ color: "#fbbf24", fontWeight: "700" }}>
+          <Text style={{ color: colors.warn, fontWeight: "700" }}>
             ⚠️ Disponible solo en la APK
           </Text>
           <Text style={styles.hint}>

@@ -43,7 +43,7 @@ export default function StravaScreen() {
   const connect = async () => {
     setBusy(true);
     try {
-      const redirectUri = makeRedirectUri({ scheme: "rcvtracker" });
+      const redirectUri = makeRedirectUri({ scheme: "vizfitness" });
       const request = new AuthRequest({
         clientId: STRAVA_CLIENT_ID,
         scopes: ["activity:read_all"],
@@ -127,7 +127,7 @@ export default function StravaScreen() {
 
       {!stravaConfigured ? (
         <Card>
-          <Text style={{ color: "#fbbf24", fontWeight: "700" }}>
+          <Text style={{ color: colors.warn, fontWeight: "700" }}>
             ⚠️ Strava no está configurado
           </Text>
           <Text style={styles.hint}>
