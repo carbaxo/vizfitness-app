@@ -93,7 +93,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto flex min-h-screen max-w-6xl">
       {/* Barra lateral en escritorio */}
-      <aside className="sticky top-0 hidden h-screen w-56 flex-col gap-1 border-r border-base-700/60 p-4 md:flex">
+      <aside className="sticky top-0 hidden h-screen w-60 flex-col gap-1 border-r border-white/5 p-4 md:flex">
         <div className="mb-6 px-2 pt-2">
           <Logo />
         </div>
@@ -104,13 +104,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+              className={`press flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-semibold transition ${
                 active
-                  ? "bg-accent/15 text-accent"
-                  : "text-slate-300 hover:bg-base-800"
+                  ? "bg-accent/12 text-accent"
+                  : "text-slate-300 hover:bg-white/5"
               }`}
             >
-              <span>{item.icon}</span>
+              <span className="text-lg">{item.icon}</span>
               {item.label}
             </Link>
           );
@@ -119,30 +119,47 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Cabecera en móvil */}
-        <header className="flex items-center justify-between border-b border-base-700/60 px-4 py-3 md:hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-white/5 bg-base-950/70 px-4 py-3 backdrop-blur-xl pt-safe md:hidden">
           <Logo />
         </header>
 
-        <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:pb-8">{children}</main>
+        {/* Sin animación en <main>: transform/opacity aquí crearían un stacking
+            context/containing block que rompería los sheets (position: fixed). */}
+        <main className="flex-1 px-4 py-6 pb-28 md:px-8 md:pb-8">{children}</main>
 
-        {/* Navegación inferior en móvil */}
-        <nav className="fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-base-700/60 bg-base-900/95 py-2 backdrop-blur md:hidden">
-          {NAV.map((item) => {
-            const active =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex flex-col items-center gap-0.5 rounded-lg px-3 py-1 text-[11px] font-medium ${
-                  active ? "text-accent" : "text-slate-400"
-                }`}
-              >
-                <span className="text-lg">{item.icon}</span>
-                {item.label}
-              </Link>
-            );
-          })}
+        {/* Barra de navegación inferior tipo app nativa */}
+        <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/5 bg-base-950/80 backdrop-blur-2xl pb-safe md:hidden">
+          <div className="mx-auto flex max-w-lg items-stretch justify-around px-2">
+            {NAV.map((item) => {
+              const active =
+                item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  className="press flex min-h-[56px] flex-1 flex-col items-center justify-center gap-1 pt-1.5"
+                >
+                  <span
+                    className={`flex h-9 w-14 items-center justify-center rounded-2xl text-xl transition-all duration-300 ease-silk ${
+                      active
+                        ? "-translate-y-0.5 scale-105 bg-accent/15 text-accent"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    {item.icon}
+                  </span>
+                  <span
+                    className={`text-[11px] font-semibold transition-colors ${
+                      active ? "text-accent" : "text-slate-500"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </nav>
       </div>
     </div>

@@ -21,13 +21,19 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
   };
 
   return (
-    <div className="card">
+    <div className="card transition-shadow">
       <button
-        className="flex w-full items-start justify-between gap-3 text-left"
+        className="flex w-full items-start justify-between gap-3 text-left transition active:scale-[0.99]"
         onClick={() => setOpen((o) => !o)}
       >
         <div className="flex items-start gap-3">
-          <span className="text-2xl">{isCardio ? sport?.emoji ?? "🏃" : "🏋️"}</span>
+          <span
+            className={`grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-2xl ${
+              isCardio ? "bg-cardio/12" : "bg-gym/12"
+            }`}
+          >
+            {isCardio ? sport?.emoji ?? "🏃" : "🏋️"}
+          </span>
           <div>
             <p className="font-semibold">{workout.name}</p>
             <p className="text-xs text-slate-400">
@@ -42,13 +48,23 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
             </p>
           </div>
         </div>
-        <span
-          className={`chip ${
-            isCardio ? "bg-cardio/15 text-cardio" : "bg-gym/15 text-gym"
-          }`}
-        >
-          {isCardio ? "Cardio" : "Gimnasio"}
-        </span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span
+            className={`chip ${
+              isCardio ? "bg-cardio/15 text-cardio" : "bg-gym/15 text-gym"
+            }`}
+          >
+            {isCardio ? "Cardio" : "Gimnasio"}
+          </span>
+          <span
+            className={`text-slate-500 transition-transform duration-300 ease-silk ${
+              open ? "rotate-180" : ""
+            }`}
+            aria-hidden
+          >
+            ⌄
+          </span>
+        </div>
       </button>
 
       <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-300">
@@ -73,7 +89,7 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
       </div>
 
       {open && (
-        <div className="mt-3 border-t border-base-700/60 pt-3">
+        <div className="mt-3 animate-rise border-t border-white/5 pt-3">
           {isCardio && (workout.cardio?.route?.length ?? 0) > 1 && (
             <div className="mb-2">
               <RouteMap route={workout.cardio!.route!} />

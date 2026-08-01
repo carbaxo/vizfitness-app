@@ -1,6 +1,12 @@
 # Publica la web (Next.js exportada como estático) en GitHub Pages.
 # URL resultante: https://carbaxo.github.io/vizfitness-app/
 #
+# Método: publica la carpeta exportada `out/` en la rama `gh-pages`. Es más
+# robusto que el despliegue nativo por entorno y no depende de reglas de
+# entorno. Para activarlo (una sola vez):
+#   Settings → Pages → Build and deployment → Source: "Deploy from a branch"
+#   → Branch: gh-pages / (root) → Save.
+#
 # Para que el login con Google funcione en esa URL, añade una vez el dominio
 # carbaxo.github.io en Firebase: Authentication → Settings → Authorized domains.
 
@@ -20,17 +26,16 @@ on:
       - "tsconfig.json"
       - ".github/workflows/web-pages.yml"
 
+# Necesario para que la acción pueda escribir en la rama gh-pages.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
   group: pages
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Descargar el código
@@ -42,11 +47,6 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Activar GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
       - name: Instalar dependencias
         run: npm ci
 
@@ -55,18 +55,12 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /vizfitness-app
         run: npx next build
 
-      - name: Subir la web compilada
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: out
+      - name: Evitar el procesado de Jekyll (necesario para la carpeta _next)
+        run: touch out/.nojekyll
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Desplegar en GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publicar en la rama gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages

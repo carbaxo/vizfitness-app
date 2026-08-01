@@ -29,9 +29,15 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
   volumen total de la sesión.
 - **🗓️ Planes de entrenamiento** — crea tu rutina semanal (días de gimnasio,
   cardio y descanso) e inicia cada sesión con un toque: los ejercicios y las
-  series se precargan solos.
-- **📚 Biblioteca de ejercicios** — más de 40 ejercicios organizados por grupo
-  muscular con notas de técnica, más tus ejercicios personalizados.
+  series se precargan solos. Incluye **plantillas de rutinas prediseñadas**
+  (cuerpo completo, torso/pierna, Push Pull Legs, fuerza + cardio) que añades
+  con un clic y editas a tu gusto.
+- **📚 Biblioteca de ejercicios** — más de **1.300 ejercicios con imágenes,
+  animación de la técnica (GIF) e instrucciones paso a paso en español**,
+  organizados por grupo muscular, buscables por nombre, músculo o equipamiento;
+  más tus ejercicios personalizados. Datos de
+  [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset)
+  (© Gym Visual); las imágenes se sirven bajo demanda desde un CDN.
 - **📈 Progreso** — gráficas de volumen semanal, evolución de peso y 1RM
   estimado por ejercicio, y kilómetros de cardio.
 - **🗺️ Rutas sobre mapa real** — las actividades con GPS (grabadas con la

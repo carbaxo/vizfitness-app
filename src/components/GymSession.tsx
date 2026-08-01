@@ -4,9 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { addWorkout, useCustomExercises, usePlans } from "@/lib/db";
-import { EXERCISE_LIBRARY } from "@/lib/exercisesSeed";
+import { useExerciseLibrary } from "@/lib/exerciseLibrary";
 import { isoDate, workoutVolumeKg } from "@/lib/stats";
 import type { SetEntry, Workout, WorkoutExercise } from "@/lib/types";
+import ExerciseImage from "./ExerciseImage";
 import RestTimer from "./RestTimer";
 
 export default function GymSession() {
@@ -14,6 +15,7 @@ export default function GymSession() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: customExercises } = useCustomExercises();
+  const { library } = useExerciseLibrary();
   const { data: plans } = usePlans();
 
   const [name, setName] = useState("Sesión de gimnasio");
@@ -51,10 +53,11 @@ export default function GymSession() {
 
   const allExercises = useMemo(() => {
     const custom = customExercises.map((e) => ({ ...e, custom: true }));
-    return [...custom, ...EXERCISE_LIBRARY].filter((e) =>
-      e.name.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [customExercises, search]);
+    const q = search.toLowerCase();
+    return [...custom, ...library]
+      .filter((e) => e.name.toLowerCase().includes(q))
+      .slice(0, 60);
+  }, [customExercises, library, search]);
 
   const addExerciseToSession = (exName: string, muscleGroup?: WorkoutExercise["muscleGroup"]) => {
     setExercises((xs) => [
@@ -250,13 +253,18 @@ export default function GymSession() {
               <button
                 key={`${e.name}-${i}`}
                 onClick={() => addExerciseToSession(e.name, e.muscleGroup)}
-                className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-base-800"
+                className="flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-base-800"
               >
-                <span>
+                <ExerciseImage
+                  media={e.media}
+                  alt={e.name}
+                  className="h-10 w-10 shrink-0 rounded-lg"
+                />
+                <span className="min-w-0 flex-1 truncate">
                   {e.name}
                   {e.custom && <span className="ml-2 chip bg-accent/15 text-accent">propio</span>}
                 </span>
-                <span className="text-xs capitalize text-slate-500">{e.muscleGroup}</span>
+                <span className="shrink-0 text-xs capitalize text-slate-500">{e.muscleGroup}</span>
               </button>
             ))}
             {search && (

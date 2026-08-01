@@ -6,7 +6,9 @@ export type MuscleGroup =
   | "hombro"
   | "biceps"
   | "triceps"
+  | "antebrazo"
   | "core"
+  | "cardio"
   | "cuerpo completo"
   | "otro";
 
@@ -18,7 +20,9 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
   "hombro",
   "biceps",
   "triceps",
+  "antebrazo",
   "core",
+  "cardio",
   "cuerpo completo",
   "otro",
 ];
@@ -30,6 +34,14 @@ export interface Exercise {
   equipment?: string;
   instructions?: string;
   custom?: boolean;
+  // Campos de la base de datos de ejercicios (hasaneyldrm/exercises-dataset).
+  // Presentes en los ejercicios de la biblioteca ilustrada, ausentes en los
+  // curados a mano y en los personalizados del usuario.
+  steps?: string[]; // instrucciones paso a paso en español
+  bodyPart?: string; // zona del cuerpo original del dataset
+  target?: string; // músculo objetivo principal (en inglés, del dataset)
+  secondary?: string[]; // músculos secundarios (en inglés, del dataset)
+  media?: string; // identificador de imagen/gif: "0001-2gPfomN"
 }
 
 export interface SetEntry {

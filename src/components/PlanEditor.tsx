@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { addPlan, useCustomExercises } from "@/lib/db";
-import { EXERCISE_LIBRARY } from "@/lib/exercisesSeed";
+import { useExerciseLibrary } from "@/lib/exerciseLibrary";
 import type { PlanDay, PlanExercise } from "@/lib/types";
 
 const EMPTY_DAY = (): PlanDay => ({
@@ -15,14 +15,15 @@ const EMPTY_DAY = (): PlanDay => ({
 export default function PlanEditor({ onSaved }: { onSaved: () => void }) {
   const { user } = useAuth();
   const { data: custom } = useCustomExercises();
+  const { library } = useExerciseLibrary();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [days, setDays] = useState<PlanDay[]>([{ ...EMPTY_DAY(), name: "Día 1" }]);
   const [saving, setSaving] = useState(false);
 
   const exerciseNames = useMemo(
-    () => [...custom.map((e) => e.name), ...EXERCISE_LIBRARY.map((e) => e.name)],
-    [custom]
+    () => [...custom.map((e) => e.name), ...library.map((e) => e.name)],
+    [custom, library]
   );
 
   const updateDay = (i: number, patch: Partial<PlanDay>) => {

@@ -49,8 +49,8 @@ export default function RestTimer() {
     <div className="card flex flex-wrap items-center gap-3">
       <span className="text-sm font-semibold text-slate-300">⏱️ Descanso</span>
       <span
-        className={`min-w-[64px] text-2xl font-bold tabular-nums ${
-          running ? "text-accent" : "text-slate-500"
+        className={`min-w-[76px] text-[26px] font-bold tracking-tightest tabular-nums transition-colors ${
+          running ? "text-accent drop-shadow-[0_0_10px_rgba(255,111,0,0.5)]" : "text-slate-500"
         }`}
       >
         {mm}:{ss}
