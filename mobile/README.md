@@ -173,8 +173,9 @@ mobile/
 
 ## 🎨 Iconos
 
-El icono de la app **es el logotipo**: VIZ en blanco y FITNESS en naranja,
-en dos líneas justificadas al mismo ancho sobre la baldosa oscura.
+El icono es la **marca de la familia Viz**: la V de dos brazos sobre el
+cuadrado redondeado con degradado, igual que VizPlay, VizSoccer y VizLessons,
+pero en naranja.
 
 Los PNG de `assets/` no se dibujan a mano: los genera, junto con los iconos de
 la web, un único script sin dependencias en la raíz del repositorio:
@@ -183,7 +184,8 @@ la web, un único script sin dependencias en la raíz del repositorio:
 node ../scripts/make-brand-assets.mjs
 ```
 
-Produce `icon.png` (el logotipo sobre la baldosa), `adaptive-icon.png` (solo el
-logotipo, encogido a la zona segura; Android pone detrás el color de
-`adaptiveIcon.backgroundColor` del `app.json`) y `splash.png`. Ver el apartado
+Produce `icon.png` (la baldosa con la V), `adaptive-icon.png` y
+`adaptive-icon-bg.png` (las dos capas del icono adaptativo: la V encogida a la
+zona segura y el degradado a sangre, que es lo que permite que el icono
+adaptativo lleve degradado y no un color plano) y `splash.png`. Ver el apartado
 de marca del [README raíz](../README.md#-marca-y-paleta).
