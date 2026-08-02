@@ -227,3 +227,14 @@ export interface PersonalRecord {
   est1RM: number;
   date: string;
 }
+
+/** Un ejercicio marcado con la estrella. */
+export interface FavoriteExercise {
+  /** ID del documento: el nombre slugificado (ver favKey en db.ts). */
+  id?: string;
+  name: string;
+  muscleGroup?: MuscleGroup;
+  equipment?: string;
+  media?: string;
+  createdAt: number;
+}

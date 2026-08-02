@@ -43,7 +43,9 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
 - **📚 Biblioteca de ejercicios** — más de **1.300 ejercicios con imágenes,
   animación de la técnica (GIF) e instrucciones paso a paso en español**,
   organizados por grupo muscular, buscables por nombre, músculo o equipamiento;
-  más tus ejercicios personalizados. Datos de
+  más tus ejercicios personalizados. Cada ejercicio se puede marcar con una
+  **estrella**: los favoritos tienen su propio filtro en la biblioteca y salen
+  los primeros al elegir ejercicio en una sesión o en un plan. Datos de
   [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset)
   (© Gym Visual); las imágenes se sirven bajo demanda desde un CDN.
 - **📈 Progreso** — gráficas de volumen semanal, evolución de peso y 1RM

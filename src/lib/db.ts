@@ -14,7 +14,14 @@ import {
 } from "firebase/firestore";
 import { getDb } from "./firebase";
 import { useAuth } from "@/context/AuthContext";
-import type { BodyMetric, Exercise, Goal, Plan, Workout } from "./types";
+import type {
+  BodyMetric,
+  Exercise,
+  FavoriteExercise,
+  Goal,
+  Plan,
+  Workout,
+} from "./types";
 
 // Todos los datos viven bajo users/{uid}/... — cada usuario solo ve lo suyo
 // (reforzado por las reglas de seguridad de Firestore en firestore.rules).
@@ -64,6 +71,35 @@ export const useCustomExercises = () => useUserCollection<Exercise>("exercises",
 export const usePlans = () => useUserCollection<Plan>("plans");
 export const useGoals = () => useUserCollection<Goal>("goals");
 export const useBodyMetrics = () => useUserCollection<BodyMetric>("metrics", "date");
+
+// ------------------------------------------------------------- favoritos
+// Los favoritos se guardan por NOMBRE, no por id de la biblioteca: el resto
+// de la app (entrenamientos, planes, circuitos) referencia los ejercicios
+// solo por su nombre, así que de esta forma un favorito se reconoce en
+// cualquier pantalla aunque allí no exista el objeto completo.
+//
+// El ID del documento es el nombre slugificado porque Firestore no admite "/"
+// en los IDs y en el dataset hay un "3/4 sit-up". El nombre de verdad va
+// dentro del documento.
+export const favKey = (name: string) =>
+  name.trim().toLowerCase().replace(/\//g, "-");
+
+export const useFavoriteExercises = () =>
+  useUserCollection<FavoriteExercise>("favorites");
+
+export async function addFavorite(uid: string, e: Exercise) {
+  // Se copian grupo, equipo e imagen para poder pintar la lista de favoritos
+  // sin esperar a que baje el dataset de 1.324 ejercicios.
+  const fav: FavoriteExercise = { name: e.name, createdAt: Date.now() };
+  if (e.muscleGroup) fav.muscleGroup = e.muscleGroup;
+  if (e.equipment) fav.equipment = e.equipment;
+  if (e.media) fav.media = e.media;
+  return setDoc(doc(getDb(), "users", uid, "favorites", favKey(e.name)), fav);
+}
+
+export async function removeFavorite(uid: string, name: string) {
+  return deleteDoc(doc(getDb(), "users", uid, "favorites", favKey(name)));
+}
 
 type WithoutId<T> = Omit<T, "id">;
 

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import ExerciseImage from "@/components/ExerciseImage";
+import FavStar, { useFavorites } from "@/components/FavStar";
 import { useAuth } from "@/context/AuthContext";
 import { addExercise, deleteExercise, useCustomExercises } from "@/lib/db";
 import { useExerciseLibrary } from "@/lib/exerciseLibrary";
@@ -20,7 +21,8 @@ function Ejercicios() {
   const { user } = useAuth();
   const { data: custom } = useCustomExercises();
   const { library, loading } = useExerciseLibrary();
-  const [group, setGroup] = useState<MuscleGroup | "todos">("todos");
+  const { isFavorite, toggle, favorites } = useFavorites();
+  const [group, setGroup] = useState<MuscleGroup | "todos" | "favoritos">("todos");
   const [search, setSearch] = useState("");
   const [detail, setDetail] = useState<Exercise | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -38,13 +40,14 @@ function Ejercicios() {
     const q = search.trim().toLowerCase();
     return all.filter(
       (e) =>
-        (group === "todos" || e.muscleGroup === group) &&
+        (group === "todos" ||
+          (group === "favoritos" ? isFavorite(e.name) : e.muscleGroup === group)) &&
         (q === "" ||
           e.name.toLowerCase().includes(q) ||
           e.equipment?.toLowerCase().includes(q) ||
           e.target?.toLowerCase().includes(q))
     );
-  }, [all, group, search]);
+  }, [all, group, search, isFavorite]);
 
   const create = async () => {
     if (!user || !name.trim()) return;
@@ -127,6 +130,14 @@ function Ejercicios() {
 
       <div className="flex flex-wrap gap-2">
         <button
+          onClick={() => setGroup("favoritos")}
+          className={`chip ${
+            group === "favoritos" ? "bg-accent/20 text-accent" : "bg-base-800 text-slate-400"
+          }`}
+        >
+          ★ favoritos{favorites.length ? ` (${favorites.length})` : ""}
+        </button>
+        <button
           onClick={() => setGroup("todos")}
           className={`chip capitalize ${
             group === "todos" ? "bg-accent/20 text-accent" : "bg-base-800 text-slate-400"
@@ -149,35 +160,47 @@ function Ejercicios() {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {filtered.map((e, i) => (
-          <button
+          <div
             key={`${e.id ?? e.name}-${i}`}
-            onClick={() => setDetail(e)}
-            className="card press group !p-0 overflow-hidden text-left hover:border-accent/40"
+            className="card group relative !p-0 overflow-hidden hover:border-accent/40"
           >
-            <div className="relative aspect-square w-full overflow-hidden">
-              <ExerciseImage
-                media={e.media}
-                alt={e.name}
-                className="h-full w-full transition-transform group-hover:scale-105"
-              />
-              {e.custom && (
-                <span className="absolute right-1.5 top-1.5 chip bg-accent/80 text-[10px] text-white">
-                  propio
-                </span>
-              )}
-            </div>
-            <div className="p-3">
-              <p className="line-clamp-2 text-sm font-semibold leading-tight">{e.name}</p>
-              <p className="mt-1 text-xs capitalize text-slate-400">
-                {e.muscleGroup}
-                {e.equipment ? ` · ${e.equipment}` : ""}
-              </p>
-            </div>
-          </button>
+            <button
+              onClick={() => setDetail(e)}
+              className="press block w-full text-left"
+            >
+              <div className="relative aspect-square w-full overflow-hidden">
+                <ExerciseImage
+                  media={e.media}
+                  alt={e.name}
+                  className="h-full w-full transition-transform group-hover:scale-105"
+                />
+                {e.custom && (
+                  <span className="absolute right-1.5 top-1.5 chip bg-accent/80 text-[10px] text-white">
+                    propio
+                  </span>
+                )}
+              </div>
+              <div className="p-3">
+                <p className="line-clamp-2 text-sm font-semibold leading-tight">{e.name}</p>
+                <p className="mt-1 text-xs capitalize text-slate-400">
+                  {e.muscleGroup}
+                  {e.equipment ? ` · ${e.equipment}` : ""}
+                </p>
+              </div>
+            </button>
+            <FavStar
+              size="sm"
+              active={isFavorite(e.name)}
+              onToggle={() => toggle(e)}
+              className="absolute left-1 top-1 bg-black/45 backdrop-blur"
+            />
+          </div>
         ))}
         {!loading && filtered.length === 0 && (
           <p className="col-span-full text-sm text-slate-400">
-            No hay ejercicios que coincidan.
+              {group === "favoritos"
+              ? "Todavía no has marcado ningún ejercicio con la estrella."
+              : "No hay ejercicios que coincidan."}
           </p>
         )}
       </div>
@@ -185,6 +208,8 @@ function Ejercicios() {
       {detail && (
         <ExerciseDetail
           exercise={detail}
+          favorite={isFavorite(detail.name)}
+          onToggleFavorite={() => toggle(detail)}
           onClose={() => setDetail(null)}
           onDelete={
             detail.custom && detail.id
@@ -202,10 +227,14 @@ function Ejercicios() {
 
 function ExerciseDetail({
   exercise,
+  favorite,
+  onToggleFavorite,
   onClose,
   onDelete,
 }: {
   exercise: Exercise;
+  favorite: boolean;
+  onToggleFavorite: () => void;
   onClose: () => void;
   onDelete?: () => void;
 }) {
@@ -240,7 +269,10 @@ function ExerciseDetail({
 
           <div className="space-y-4 p-5">
           <div>
-            <h2 className="text-xl font-bold">{exercise.name}</h2>
+            <div className="flex items-start justify-between gap-3">
+              <h2 className="text-xl font-bold">{exercise.name}</h2>
+              <FavStar active={favorite} onToggle={onToggleFavorite} className="-mr-1 -mt-1" />
+            </div>
             <div className="mt-2 flex flex-wrap gap-2">
               <span className="chip capitalize bg-accent/15 text-accent">
                 {exercise.muscleGroup}

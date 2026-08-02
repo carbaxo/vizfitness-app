@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useExerciseLibrary } from "@/lib/exerciseLibrary";
-import type { MuscleGroup } from "@/lib/types";
+import type { Exercise, MuscleGroup } from "@/lib/types";
 import ExerciseImage from "./ExerciseImage";
+import FavStar, { useFavorites } from "./FavStar";
 
 // Selector visual de ejercicios de la biblioteca: se elige por imagen, no solo
 // por el nombre. Sugiere el mismo grupo muscular por defecto y busca en todos.
@@ -15,6 +16,7 @@ export default function ExercisePicker({
   onPick: (name: string) => void;
 }) {
   const { library } = useExerciseLibrary();
+  const { isFavorite, toggle, favorites } = useFavorites();
   const [search, setSearch] = useState("");
 
   const list = useMemo(() => {
@@ -31,6 +33,36 @@ export default function ExercisePicker({
       )
       .slice(0, 60);
   }, [library, search, preferredGroup]);
+
+  // Sin búsqueda, los favoritos van arriba del todo: es lo que se elige una y
+  // otra vez, y aquí es donde de verdad ahorran tiempo. Se resuelven contra la
+  // biblioteca para tener imagen y grupo aunque el favorito sea antiguo.
+  const favList = useMemo(() => {
+    if (search.trim()) return [];
+    return favorites.map(
+      (f) =>
+        library.find((e) => e.name === f.name) ?? {
+          name: f.name,
+          muscleGroup: f.muscleGroup ?? ("otro" as MuscleGroup),
+          media: f.media,
+          equipment: f.equipment,
+        }
+    );
+  }, [favorites, library, search]);
+
+  const row = (e: Pick<Exercise, "name" | "muscleGroup" | "media">, key: string) => (
+    <div key={key} className="flex items-center gap-1">
+      <button
+        onClick={() => onPick(e.name)}
+        className="press flex min-w-0 flex-1 items-center gap-3 rounded-xl px-2 py-1.5 text-left text-sm hover:bg-base-800"
+      >
+        <ExerciseImage media={e.media} alt={e.name} className="h-11 w-11 shrink-0 rounded-xl" />
+        <span className="min-w-0 flex-1 truncate">{e.name}</span>
+        <span className="shrink-0 text-xs capitalize text-slate-500">{e.muscleGroup}</span>
+      </button>
+      <FavStar size="sm" active={isFavorite(e.name)} onToggle={() => toggle(e)} />
+    </div>
+  );
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -50,17 +82,18 @@ export default function ExercisePicker({
         )}
       </div>
       <div className="min-h-0 flex-1 space-y-1 overflow-y-auto px-4 pb-4 scroll-momentum">
-        {list.map((e, i) => (
-          <button
-            key={`${e.id ?? e.name}-${i}`}
-            onClick={() => onPick(e.name)}
-            className="press flex w-full items-center gap-3 rounded-xl px-2 py-1.5 text-left text-sm hover:bg-base-800"
-          >
-            <ExerciseImage media={e.media} alt={e.name} className="h-11 w-11 shrink-0 rounded-xl" />
-            <span className="min-w-0 flex-1 truncate">{e.name}</span>
-            <span className="shrink-0 text-xs capitalize text-slate-500">{e.muscleGroup}</span>
-          </button>
-        ))}
+        {favList.length > 0 && (
+          <>
+            <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-accent">
+              ★ Favoritos
+            </p>
+            {favList.map((e, i) => row(e, `fav-${e.name}-${i}`))}
+            <p className="px-2 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              {preferredGroup ? preferredGroup : "Todos"}
+            </p>
+          </>
+        )}
+        {list.map((e, i) => row(e, `${e.id ?? e.name}-${i}`))}
         {list.length === 0 && (
           <p className="px-2 py-6 text-sm text-slate-400">No hay ejercicios que coincidan.</p>
         )}
