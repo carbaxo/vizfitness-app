@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { addPlan, useCustomExercises } from "@/lib/db";
-import { useExerciseLibrary } from "@/lib/exerciseLibrary";
+import { addPlan } from "@/lib/db";
+import { useExerciseIndex } from "@/lib/exerciseLibrary";
 import type { PlanDay, PlanExercise } from "@/lib/types";
+import ExercisePicker from "./ExercisePicker";
+import PlanExerciseRow from "./PlanExerciseRow";
 
 const EMPTY_DAY = (): PlanDay => ({
   name: "",
@@ -14,17 +16,13 @@ const EMPTY_DAY = (): PlanDay => ({
 
 export default function PlanEditor({ onSaved }: { onSaved: () => void }) {
   const { user } = useAuth();
-  const { data: custom } = useCustomExercises();
-  const { library } = useExerciseLibrary();
+  const { find } = useExerciseIndex();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [days, setDays] = useState<PlanDay[]>([{ ...EMPTY_DAY(), name: "Día 1" }]);
   const [saving, setSaving] = useState(false);
-
-  const exerciseNames = useMemo(
-    () => [...custom.map((e) => e.name), ...library.map((e) => e.name)],
-    [custom, library]
-  );
+  // Qué ejercicio se está eligiendo. `ei: null` = se está añadiendo uno nuevo.
+  const [picking, setPicking] = useState<{ di: number; ei: number | null } | null>(null);
 
   const updateDay = (i: number, patch: Partial<PlanDay>) => {
     setDays((ds) => ds.map((d, j) => (j === i ? { ...d, ...patch } : d)));
@@ -38,10 +36,19 @@ export default function PlanEditor({ onSaved }: { onSaved: () => void }) {
     setDays((ds) => ds.filter((_, j) => j !== i));
   };
 
-  const addExercise = (di: number) => {
-    updateDay(di, {
-      exercises: [...days[di].exercises, { name: "", sets: 3, reps: "8-12" }],
-    });
+  // Se elige siempre desde el selector visual, así que no hay estado
+  // intermedio con el nombre a medio escribir.
+  const pickExercise = (exName: string) => {
+    if (!picking) return;
+    const { di, ei } = picking;
+    if (ei === null) {
+      updateDay(di, {
+        exercises: [...days[di].exercises, { name: exName, sets: 3, reps: "8-12" }],
+      });
+    } else {
+      updateExercise(di, ei, { name: exName });
+    }
+    setPicking(null);
   };
 
   const updateExercise = (di: number, ei: number, patch: Partial<PlanExercise>) => {
@@ -97,12 +104,6 @@ export default function PlanEditor({ onSaved }: { onSaved: () => void }) {
         onChange={(e) => setDescription(e.target.value)}
       />
 
-      <datalist id="plan-exercise-names">
-        {exerciseNames.map((n) => (
-          <option key={n} value={n} />
-        ))}
-      </datalist>
-
       {days.map((day, di) => (
         <div key={di} className="rounded-xl border border-base-700/60 bg-base-800/50 p-3">
           <div className="flex flex-wrap items-center gap-2">
@@ -139,12 +140,12 @@ export default function PlanEditor({ onSaved }: { onSaved: () => void }) {
             <div className="mt-3 space-y-2">
               {day.exercises.map((ex, ei) => (
                 <div key={ei} className="grid grid-cols-[1fr_4.5rem_5rem_2rem] items-center gap-2">
-                  <input
-                    className="input !py-1.5"
-                    list="plan-exercise-names"
-                    placeholder="Ejercicio"
-                    value={ex.name}
-                    onChange={(e) => updateExercise(di, ei, { name: e.target.value })}
+                  <PlanExerciseRow
+                    name={ex.name}
+                    sets={ex.sets}
+                    reps={ex.reps}
+                    media={find(ex.name)?.media}
+                    onClick={() => setPicking({ di, ei })}
                   />
                   <input
                     className="input !py-1.5"
@@ -177,7 +178,7 @@ export default function PlanEditor({ onSaved }: { onSaved: () => void }) {
                 <span />
               </div>
               <button
-                onClick={() => addExercise(di)}
+                onClick={() => setPicking({ di, ei: null })}
                 className="btn-secondary !px-3 !py-1.5 !text-xs"
               >
                 + Ejercicio
@@ -208,6 +209,27 @@ export default function PlanEditor({ onSaved }: { onSaved: () => void }) {
           {saving ? "Guardando…" : "Guardar plan"}
         </button>
       </div>
+
+      {picking && (
+        <div className="sheet-backdrop" onClick={() => setPicking(null)}>
+          <div className="sheet" onClick={(e) => e.stopPropagation()}>
+            <div className="grabber" />
+            <div className="flex items-center justify-between gap-3 border-b border-white/5 p-4">
+              <p className="font-semibold">
+                {picking.ei === null ? "Añadir ejercicio" : "Cambiar ejercicio"}
+              </p>
+              <button
+                onClick={() => setPicking(null)}
+                className="press grid h-11 w-11 shrink-0 place-items-center rounded-full bg-base-800 text-lg"
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
+            </div>
+            <ExercisePicker onPick={pickExercise} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

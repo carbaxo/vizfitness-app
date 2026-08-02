@@ -9,17 +9,25 @@ import ExercisePicker from "./ExercisePicker";
 // pasan los callbacks, cambiarlo por otro de forma visual o quitarlo.
 export default function ExerciseEditSheet({
   name,
+  libraryName,
   onClose,
   onReplace,
   onRemove,
 }: {
   name: string;
+  /**
+   * Nombre con el que buscar en la biblioteca, si no es el mismo que se
+   * muestra. Lo usan las estaciones de los circuitos: su nombre es propio y
+   * en español ("Jalón con banda larga") y el dataset está en inglés.
+   */
+  libraryName?: string;
   onClose: () => void;
   onReplace?: (newName: string) => void;
   onRemove?: () => void;
 }) {
   const { library } = useExerciseLibrary();
-  const exercise = useMemo(() => library.find((e) => e.name === name), [library, name]);
+  const lookup = libraryName ?? name;
+  const exercise = useMemo(() => library.find((e) => e.name === lookup), [library, lookup]);
   const [picking, setPicking] = useState(false);
 
   return (

@@ -9,6 +9,7 @@ import { isoDate, workoutVolumeKg } from "@/lib/stats";
 import type { SetEntry, Workout, WorkoutExercise } from "@/lib/types";
 import ExerciseImage from "./ExerciseImage";
 import FavStar, { useFavorites } from "./FavStar";
+import ExerciseEditSheet from "./ExerciseEditSheet";
 import RestTimer from "./RestTimer";
 
 export default function GymSession() {
@@ -19,6 +20,7 @@ export default function GymSession() {
   const { library } = useExerciseLibrary();
   const { data: plans } = usePlans();
   const { isFavorite, toggle, favorites } = useFavorites();
+  const [detail, setDetail] = useState<string | null>(null);
 
   const [name, setName] = useState("Sesión de gimnasio");
   const [exercises, setExercises] = useState<WorkoutExercise[]>([]);
@@ -175,11 +177,23 @@ export default function GymSession() {
 
       {exercises.map((ex, ei) => (
         <div key={ei} className="card">
-          <div className="flex items-center justify-between">
-            <p className="font-semibold">{ex.name}</p>
+          <div className="flex items-center justify-between gap-2">
+            {/* Toca el ejercicio para ver el GIF de la técnica */}
+            <button
+              onClick={() => setDetail(ex.name)}
+              className="press flex min-w-0 flex-1 items-center gap-2.5 text-left"
+            >
+              <ExerciseImage
+                media={library.find((l) => l.name === ex.name)?.media}
+                alt={ex.name}
+                className="h-9 w-9 shrink-0 rounded-lg !text-base"
+              />
+              <span className="min-w-0 flex-1 truncate font-semibold">{ex.name}</span>
+              <span className="shrink-0 text-slate-600">›</span>
+            </button>
             <button
               onClick={() => removeExercise(ei)}
-              className="text-xs text-red-400 hover:underline"
+              className="shrink-0 text-xs text-red-400 hover:underline"
             >
               Quitar
             </button>
@@ -315,6 +329,10 @@ export default function GymSession() {
       >
         {saving ? "Guardando…" : "Finalizar y guardar sesión"}
       </button>
+
+      {detail && (
+        <ExerciseEditSheet name={detail} onClose={() => setDetail(null)} />
+      )}
     </div>
   );
 }

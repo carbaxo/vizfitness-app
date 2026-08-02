@@ -11,6 +11,8 @@ import {
 } from "@/lib/routineTemplates";
 import type { PlanDay } from "@/lib/types";
 import ExerciseEditSheet from "./ExerciseEditSheet";
+import PlanExerciseRow from "./PlanExerciseRow";
+import { useExerciseIndex } from "@/lib/exerciseLibrary";
 import ExercisePicker from "./ExercisePicker";
 
 const LEVEL_COLOR: Record<RoutineTemplate["level"], string> = {
@@ -24,6 +26,7 @@ const cloneDays = (days: PlanDay[]): PlanDay[] =>
 
 export default function RoutineTemplates({ onAdded }: { onAdded?: () => void }) {
   const { user } = useAuth();
+  const { find } = useExerciseIndex();
   const [preview, setPreview] = useState<RoutineTemplate | null>(null);
   const [draft, setDraft] = useState<PlanDay[]>([]);
   const [editing, setEditing] = useState<{ di: number; ei: number } | null>(null);
@@ -156,18 +159,13 @@ export default function RoutineTemplates({ onAdded }: { onAdded?: () => void }) 
                     <ul className="mt-2 space-y-0.5">
                       {day.exercises.map((e, ei) => (
                         <li key={ei}>
-                          <button
+                          <PlanExerciseRow
+                            name={e.name}
+                            sets={e.sets}
+                            reps={e.reps}
+                            media={find(e.name)?.media}
                             onClick={() => setEditing({ di, ei })}
-                            className="press flex w-full items-center justify-between gap-2 rounded-lg py-1 text-left text-xs text-slate-300 hover:text-white"
-                          >
-                            <span className="min-w-0 truncate">
-                              {e.name}{" "}
-                              <span className="text-slate-500">
-                                — {e.sets}×{e.reps}
-                              </span>
-                            </span>
-                            <span className="shrink-0 text-slate-600">›</span>
-                          </button>
+                          />
                         </li>
                       ))}
                       <li>

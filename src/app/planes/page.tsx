@@ -6,6 +6,8 @@ import AppShell from "@/components/AppShell";
 import PlanEditor from "@/components/PlanEditor";
 import RoutineTemplates from "@/components/RoutineTemplates";
 import ExerciseEditSheet from "@/components/ExerciseEditSheet";
+import PlanExerciseRow from "@/components/PlanExerciseRow";
+import { useExerciseIndex } from "@/lib/exerciseLibrary";
 import { useAuth } from "@/context/AuthContext";
 import { deletePlan, updatePlan, usePlans } from "@/lib/db";
 import type { Plan } from "@/lib/types";
@@ -21,6 +23,7 @@ export default function PlanesPage() {
 function Planes() {
   const { user } = useAuth();
   const { data: plans, loading } = usePlans();
+  const { find } = useExerciseIndex();
   const [editing, setEditing] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   // Ejercicio abierto para ver/cambiar dentro de un plan guardado.
@@ -184,18 +187,13 @@ function Planes() {
                     <ul className="mt-2 space-y-0.5">
                       {day.exercises.map((e, i) => (
                         <li key={i}>
-                          <button
+                          <PlanExerciseRow
+                            name={e.name}
+                            sets={e.sets}
+                            reps={e.reps}
+                            media={find(e.name)?.media}
                             onClick={() => setEditingEx({ planId: plan.id!, di, ei: i })}
-                            className="press flex w-full items-center justify-between gap-2 rounded-lg py-1 text-left text-xs text-slate-400 hover:text-slate-200"
-                          >
-                            <span className="min-w-0 truncate">
-                              {e.name}{" "}
-                              <span className="text-slate-500">
-                                — {e.sets}×{e.reps}
-                              </span>
-                            </span>
-                            <span className="shrink-0 text-slate-600">›</span>
-                          </button>
+                          />
                         </li>
                       ))}
                     </ul>
