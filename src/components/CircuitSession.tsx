@@ -531,10 +531,10 @@ function Runner({
 
   const tone =
     step.kind === "work"
-      ? { text: "text-accent", bar: "bg-accent", ring: "ring-accent/40" }
+      ? { text: "text-accent", stroke: "stroke-accent", ring: "ring-accent/40" }
       : step.kind === "transition"
-        ? { text: "text-gym", bar: "bg-gym", ring: "ring-gym/40" }
-        : { text: "text-slate-300", bar: "bg-slate-500", ring: "ring-white/10" };
+        ? { text: "text-gym", stroke: "stroke-gym", ring: "ring-gym/40" }
+        : { text: "text-slate-300", stroke: "stroke-slate-500", ring: "ring-white/10" };
 
   const title =
     step.kind === "prep"
@@ -546,81 +546,128 @@ function Runner({
           : "Descanso de ronda";
 
   const round = step.kind === "prep" ? 1 : step.round;
-  const pct = step.sec > 0 ? ((step.sec - remaining) / step.sec) * 100 : 100;
+  // Fracción que QUEDA: el anillo se vacía según pasa el tiempo
+  const restante = step.sec > 0 ? remaining / step.sec : 0;
+
+  // Círculo de progreso: perímetro y cuánto queda sin recorrer
+  const R = 46;
+  const C = 2 * Math.PI * R;
+  const urgente = step.kind !== "roundRest" && remaining <= 5 && remaining > 0;
 
   return (
-    <div className="space-y-4">
-      <div className={`card ring-1 ${tone.ring}`}>
-        <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-400">
-          <span>{title}</span>
-          <span>
-            Ronda {round}/{circuit.rounds}
-            {step.kind === "work" && ` · Estación ${step.station + 1}/${circuit.stations.length}`}
-          </span>
-        </div>
+    <div className="space-y-3 [@media(max-height:560px)]:space-y-1.5">
+      <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <span className={tone.text}>{title}</span>
+        <span>
+          Ronda {round}/{circuit.rounds}
+          {step.kind === "work" && ` · ${step.station + 1}/${circuit.stations.length}`}
+        </span>
+      </div>
 
-        <p
-          className={`mt-1 text-center text-[64px] font-bold leading-none tabular-nums tracking-tightest ${tone.text}`}
-        >
-          {mmss(remaining)}
-        </p>
-
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-base-800">
-          <div
-            className={`h-full rounded-full transition-[width] duration-200 ease-linear ${tone.bar}`}
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-
-        <div className="mt-4 text-center">
-          {step.kind === "roundRest" ? (
-            <p className="text-lg font-semibold">Respira. Vuelve a empezar.</p>
-          ) : (
-            <>
-              <p className="text-xs text-slate-500">
-                {step.kind === "work" ? "Ahora" : "A continuación"}
-              </p>
-              {/* La imagen del ejercicio, y al tocarla la ficha con el GIF:
-                  en transición enseña ya la estación que viene, que es
-                  justo cuando te hace falta saber qué toca. */}
-              <button
-                onClick={() => setDetail(station)}
-                className="press mx-auto mt-2 block"
-                aria-label={`Ver ${station.name}`}
+      {/* Pantalla partida: el reloj y el ejercicio en marcha.
+          En apaisado y en pantalla ancha van uno al lado del otro; con el
+          móvil en vertical se apilan, porque dos columnas en 180 px dejan el
+          GIF demasiado pequeño para que sirva de algo. */}
+      <div className="grid grid-cols-1 gap-3 landscape:grid-cols-2 sm:grid-cols-2">
+        {/* ---------------------------------------------------- el reloj */}
+        <div className={`card !p-3 ring-1 mx-auto w-[min(24vh,100%)] landscape:w-[min(34vh,100%)] ${tone.ring}`}>
+          <div className="relative aspect-square w-full">
+            <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+              <circle
+                cx="50"
+                cy="50"
+                r={R}
+                fill="none"
+                strokeWidth="7"
+                className="stroke-base-800"
+              />
+              <circle
+                cx="50"
+                cy="50"
+                r={R}
+                fill="none"
+                strokeWidth="7"
+                strokeLinecap="round"
+                className={`${tone.stroke} transition-[stroke-dashoffset] duration-200 ease-linear`}
+                strokeDasharray={C}
+                strokeDashoffset={C * (1 - restante)}
+              />
+            </svg>
+            <div className="absolute inset-0 grid place-items-center">
+              <span
+                className={`font-black tabular-nums leading-none tracking-tightest ${tone.text} ${
+                  urgente ? "animate-pop drop-shadow-[0_0_18px_rgba(255,111,0,0.55)]" : ""
+                }`}
+                style={{ fontSize: urgente ? "clamp(3rem,17vw,5.5rem)" : "clamp(2.6rem,15vw,4.8rem)" }}
               >
-                <ExerciseImage
-                  media={find(station.libraryName ?? "")?.media}
-                  alt={station.name}
-                  className="h-28 w-28 rounded-2xl"
-                />
-              </button>
-              <p className="mt-2 text-xl font-bold">{station.name}</p>
-              <p className="mt-1 text-sm text-slate-400">
-                {equipmentOf(station.equipment).emoji}{" "}
-                {equipmentOf(station.equipment).label}
-                {station.reps ? ` · ${station.reps}` : ""}
-              </p>
-              {station.note && (
-                <p className="mx-auto mt-2 max-w-sm text-xs leading-relaxed text-slate-500">
-                  {station.note}
-                </p>
-              )}
-            </>
-          )}
+                {remaining >= 60 ? mmss(remaining) : remaining}
+              </span>
+            </div>
+          </div>
         </div>
+
+        {/* ------------------------------------------- el ejercicio en marcha */}
+        <button
+          onClick={() => setDetail(station)}
+          className="press card relative !p-0 overflow-hidden text-left mx-auto w-[min(24vh,100%)] landscape:w-[min(34vh,100%)]"
+          aria-label={`Ver ${station.name}`}
+        >
+          <div className="aspect-square w-full">
+            {step.kind === "roundRest" ? (
+              <div className="grid h-full w-full place-items-center bg-base-800/60 text-4xl">
+                😮‍💨
+              </div>
+            ) : (
+              <ExerciseImage
+                media={find(station.libraryName ?? "")?.media}
+                alt={station.name}
+                alwaysAnimate
+                className="h-full w-full"
+              />
+            )}
+          </div>
+          {step.kind === "transition" && (
+            <span className="absolute left-1.5 top-1.5 chip bg-gym/85 text-[10px] text-base-950">
+              Siguiente
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Nombre y detalle debajo, a lo ancho de las dos columnas */}
+      <div className="text-center">
+        {step.kind === "roundRest" ? (
+          <p className="text-lg font-semibold">Respira. Vuelve a empezar.</p>
+        ) : (
+          <>
+            <p className="text-xl font-bold leading-tight [@media(max-height:560px)]:text-base">
+              {station.name}
+            </p>
+            <p className="mt-1 text-sm text-slate-400 [@media(max-height:560px)]:mt-0 [@media(max-height:560px)]:text-xs">
+              {equipmentOf(station.equipment).emoji}{" "}
+              {equipmentOf(station.equipment).label}
+              {station.reps ? ` · ${station.reps}` : ""}
+            </p>
+            {station.note && (
+              <p className="mx-auto mt-1.5 max-w-sm text-xs leading-relaxed text-slate-500 [@media(max-height:560px)]:hidden">
+                {station.note}
+              </p>
+            )}
+          </>
+        )}
       </div>
 
       {step.kind === "work" && nextWork && (
-        <p className="text-center text-xs text-slate-500">
+        <p className="text-center text-xs text-slate-500 [@media(max-height:560px)]:hidden">
           Siguiente: {circuit.stations[nextWork.station].name}
         </p>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
-        <button onClick={toggle} className="btn-secondary py-3">
+      <div className="grid grid-cols-3 gap-2 [@media(max-height:560px)]:gap-1.5">
+        <button onClick={toggle} className="btn-secondary py-3 [@media(max-height:560px)]:py-2">
           {paused ? "▶ Seguir" : "⏸ Pausa"}
         </button>
-        <button onClick={() => advance(idx + 1)} className="btn-secondary py-3">
+        <button onClick={() => advance(idx + 1)} className="btn-secondary py-3 [@media(max-height:560px)]:py-2">
           ⏭ Saltar
         </button>
         <button
@@ -630,13 +677,13 @@ function Runner({
               setDone(true);
             }
           }}
-          className="btn-danger py-3"
+          className="btn-danger py-3 [@media(max-height:560px)]:py-2"
         >
           Terminar
         </button>
       </div>
 
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center gap-2 landscape:justify-between">
         <button
           onClick={() => setVoice((v) => !v)}
           className={`chip ${voice ? "bg-accent/15 text-accent" : "bg-base-800 text-slate-500"}`}

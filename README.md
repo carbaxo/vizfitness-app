@@ -34,8 +34,10 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
   casa, WOD exprés, Tabata y tres **con bandas elásticas, cortas y largas**—,
   con rondas y tiempos ajustables, y puedes quitar las estaciones cuyo
   material no tengas, y **ajustar el trabajo y el descanso estación por
-  estación**. Cada estación enseña **la imagen del ejercicio**, y al tocarla se
-  abre el GIF de la técnica. Una **voz en español** canta la cuenta atrás
+  estación**. Al empezar, la pantalla se **parte en dos**: el
+  cronómetro con el número grande y su anillo de progreso a un lado, y **el GIF
+  del ejercicio en movimiento** al otro. En el móvil en vertical van uno encima
+  del otro; tumbado o en el ordenador, uno al lado del otro. Una **voz en español** canta la cuenta atrás
   (5, 4, 3, 2, 1) y dice qué estación toca, para no tener que mirar la
   pantalla. Y lleva **música**: un ritmo
   sintetizado en el navegador (tres estilos) que acelera al trabajar y se
