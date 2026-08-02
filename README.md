@@ -34,10 +34,13 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
   segundos y mantiene la pantalla encendida. Seis circuitos listos —Hyrox en
   casa, WOD exprés, Tabata y tres **con bandas elásticas, cortas y largas**—,
   con rondas y tiempos ajustables, y puedes quitar las estaciones cuyo
-  material no tengas.
+  material no tengas. Cada estación enseña **la imagen del ejercicio**, y al
+  tocarla se abre el GIF de la técnica.
 - **🗓️ Planes de entrenamiento** — crea tu rutina semanal (días de gimnasio,
   cardio y descanso) e inicia cada sesión con un toque: los ejercicios y las
-  series se precargan solos. Incluye **plantillas de rutinas prediseñadas**
+  series se precargan solos. Los ejercicios se eligen **por imagen**, no
+  escribiendo el nombre, y cada uno se ve con su miniatura dentro del plan.
+  Incluye **plantillas de rutinas prediseñadas**
   (cuerpo completo, torso/pierna, Push Pull Legs, fuerza + cardio) que añades
   con un clic y editas a tu gusto.
 - **📚 Biblioteca de ejercicios** — más de **1.300 ejercicios con imágenes,

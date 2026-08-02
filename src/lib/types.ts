@@ -125,6 +125,16 @@ export const STATION_EQUIPMENT: {
 export interface CircuitStation {
   name: string;
   equipment: StationEquipment;
+  /**
+   * Nombre EXACTO del ejercicio equivalente en la biblioteca, para poder
+   * enseñar su imagen y su GIF: los nombres de las estaciones son propios y en
+   * español, y el dataset está en inglés.
+   *
+   * Va vacío a propósito cuando no hay un equivalente que haga el mismo
+   * movimiento. Un GIF equivocado es peor que ninguno para quien abre la
+   * estación justamente porque no sabe qué ejercicio es.
+   */
+  libraryName?: string;
   /** Duración de la estación. Si hay `reps`, el tiempo es solo el tope. */
   workSec: number;
   reps?: string;

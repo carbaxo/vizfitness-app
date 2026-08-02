@@ -9,6 +9,9 @@ import { CIRCUIT_TEMPLATES } from "@/lib/circuitTemplates";
 import { STATION_EQUIPMENT } from "@/lib/types";
 import type { Circuit, CircuitStation, StationEquipment, Workout } from "@/lib/types";
 import { finishSignal, goSignal, tick } from "@/lib/beep";
+import { useExerciseIndex } from "@/lib/exerciseLibrary";
+import ExerciseImage from "./ExerciseImage";
+import ExerciseEditSheet from "./ExerciseEditSheet";
 
 const PREP_SEC = 10;
 
@@ -71,6 +74,8 @@ function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
   const [transitionSec, setTransitionSec] = useState(template.transitionSec);
   const [roundRestSec, setRoundRestSec] = useState(template.roundRestSec);
   const [off, setOff] = useState<Set<number>>(new Set());
+  const [detail, setDetail] = useState<CircuitStation | null>(null);
+  const { find } = useExerciseIndex();
 
   const choose = (i: number) => {
     const t = CIRCUIT_TEMPLATES[i];
@@ -165,28 +170,48 @@ function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
               const disabled = off.has(i);
               const eq = equipmentOf(st.equipment);
               return (
-                <button
+                <div
                   key={i}
-                  onClick={() =>
-                    setOff((s) => {
-                      const n = new Set(s);
-                      if (n.has(i)) n.delete(i);
-                      else if (s.size < template.stations.length - 1) n.add(i);
-                      return n;
-                    })
-                  }
-                  className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-sm transition ${
+                  className={`flex items-center gap-2 rounded-xl border px-2 py-1.5 transition ${
                     disabled
-                      ? "border-base-700 text-slate-600 line-through"
-                      : "border-base-600 bg-base-800/60 text-slate-200"
+                      ? "border-base-700 opacity-45"
+                      : "border-base-600 bg-base-800/60"
                   }`}
                 >
-                  <span className="text-base">{eq.emoji}</span>
-                  <span className="min-w-0 flex-1 truncate">{st.name}</span>
-                  <span className="shrink-0 text-xs text-slate-500">
-                    {st.reps ?? `${st.workSec}s`}
-                  </span>
-                </button>
+                  {/* La miniatura abre la ficha con el GIF: por el nombre no
+                      siempre se sabe cuál es el ejercicio. */}
+                  <button
+                    onClick={() => setDetail(st)}
+                    className="press shrink-0"
+                    aria-label={`Ver ${st.name}`}
+                  >
+                    <ExerciseImage
+                      media={find(st.libraryName ?? "")?.media}
+                      alt={st.name}
+                      className="h-10 w-10 rounded-lg !text-base"
+                    />
+                  </button>
+                  <button
+                    onClick={() =>
+                      setOff((s) => {
+                        const n = new Set(s);
+                        if (n.has(i)) n.delete(i);
+                        else if (s.size < template.stations.length - 1) n.add(i);
+                        return n;
+                      })
+                    }
+                    className={`min-w-0 flex-1 text-left text-sm ${
+                      disabled ? "text-slate-600 line-through" : "text-slate-200"
+                    }`}
+                  >
+                    <span className="block truncate">
+                      {eq.emoji} {st.name}
+                    </span>
+                    <span className="block text-[11px] text-slate-500">
+                      {st.reps ?? `${st.workSec}s`}
+                    </span>
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -200,6 +225,14 @@ function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
       >
         Empezar circuito
       </button>
+
+      {detail && (
+        <ExerciseEditSheet
+          name={detail.name}
+          libraryName={detail.libraryName}
+          onClose={() => setDetail(null)}
+        />
+      )}
     </div>
   );
 }
@@ -262,6 +295,8 @@ function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
   const [done, setDone] = useState(false);
   const [saving, setSaving] = useState(false);
   const [startedAt] = useState(() => Date.now());
+  const [detail, setDetail] = useState<CircuitStation | null>(null);
+  const { find } = useExerciseIndex();
   const lastTick = useRef<number>(-1);
 
   const step = steps[Math.min(idx, steps.length - 1)];
@@ -458,7 +493,21 @@ function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
               <p className="text-xs text-slate-500">
                 {step.kind === "work" ? "Ahora" : "A continuación"}
               </p>
-              <p className="mt-0.5 text-xl font-bold">{station.name}</p>
+              {/* La imagen del ejercicio, y al tocarla la ficha con el GIF:
+                  en transición enseña ya la estación que viene, que es
+                  justo cuando te hace falta saber qué toca. */}
+              <button
+                onClick={() => setDetail(station)}
+                className="press mx-auto mt-2 block"
+                aria-label={`Ver ${station.name}`}
+              >
+                <ExerciseImage
+                  media={find(station.libraryName ?? "")?.media}
+                  alt={station.name}
+                  className="h-28 w-28 rounded-2xl"
+                />
+              </button>
+              <p className="mt-2 text-xl font-bold">{station.name}</p>
               <p className="mt-1 text-sm text-slate-400">
                 {equipmentOf(station.equipment).emoji}{" "}
                 {equipmentOf(station.equipment).label}
@@ -499,6 +548,14 @@ function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
           Terminar
         </button>
       </div>
+
+      {detail && (
+        <ExerciseEditSheet
+          name={detail.name}
+          libraryName={detail.libraryName}
+          onClose={() => setDetail(null)}
+        />
+      )}
     </div>
   );
 }

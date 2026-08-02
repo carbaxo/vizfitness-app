@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Exercise, MuscleGroup } from "./types";
 
 // Base de datos de ejercicios ilustrada (1.324 ejercicios con imágenes y GIFs).
@@ -102,4 +102,28 @@ export function useExerciseLibrary() {
   }, []);
 
   return { library: dataset, dataset, loading };
+}
+
+/**
+ * Índice nombre → ejercicio.
+ *
+ * Los planes, los entrenamientos y los circuitos guardan solo el NOMBRE del
+ * ejercicio, así que para pintar su imagen hay que resolverlo contra la
+ * biblioteca. Con un Map se hace en O(1) en vez de recorrer 1.324 elementos
+ * por cada fila de cada día de cada plan.
+ *
+ * Los ejercicios personalizados del usuario no están aquí porque no tienen
+ * imagen: `find` devuelve undefined y ExerciseImage pinta su marcador.
+ */
+export function useExerciseIndex() {
+  const { library, loading } = useExerciseLibrary();
+  const byName = useMemo(() => {
+    const m = new Map<string, Exercise>();
+    for (const e of library) m.set(e.name.trim().toLowerCase(), e);
+    return m;
+  }, [library]);
+  return {
+    loading,
+    find: (name: string) => byName.get(name.trim().toLowerCase()),
+  };
 }
