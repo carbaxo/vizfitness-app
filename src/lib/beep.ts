@@ -6,6 +6,10 @@
 
 let ctx: AudioContext | null = null;
 
+export function getAudioContext(): AudioContext | null {
+  return audio();
+}
+
 function audio(): AudioContext | null {
   try {
     if (!ctx) {

@@ -1,15 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { GROOVE_STYLES, Groove, type GrooveStyle } from "@/lib/groove";
 
 /**
- * Música para los circuitos.
+ * Música para los circuitos. Dos fuentes:
  *
- * Suenan **archivos tuyos**: se eligen del móvil o del ordenador y se
- * reproducen con un `<audio>` normal. No se suben a ningún sitio —se usan
- * object URLs, que solo existen en la pestaña— y no hay integración con
- * Spotify ni con ningún servicio: eso necesitaría OAuth, un backend y una
- * licencia, y aun así no dejan reproducir pistas completas desde una web.
+ * - **Ritmo integrado**: se sintetiza en el navegador (ver lib/groove.ts). No
+ *   hay archivos que descargar, funciona sin conexión y sigue al cronómetro.
+ * - **Tus canciones**: archivos del móvil o del ordenador, con un `<audio>`
+ *   normal. No se suben a ningún sitio —object URLs, que solo existen en la
+ *   pestaña.
+ *
+ * No hay integración con Spotify ni similares: necesitaría OAuth, un backend
+ * y una licencia, y aun así no dejan reproducir pistas completas desde una web.
  *
  * Los avisos del cronómetro no dependen de esto: son WebAudio, van por su
  * canal y se oyen por encima de la música (también de la que estés
@@ -20,11 +24,28 @@ export interface Track {
   url: string;
 }
 
+export type MusicSource = "ninguna" | "ritmo" | "mias";
+
 export function useCircuitMusic() {
+  const [source, setSource] = useState<MusicSource>("ritmo");
+  const [style, setStyle] = useState<GrooveStyle>("pulso");
   const [tracks, setTracks] = useState<Track[]>([]);
   const [idx, setIdx] = useState(0);
   const [volume, setVolume] = useState(0.6);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const grooveRef = useRef<Groove | null>(null);
+  if (!grooveRef.current && typeof window !== "undefined") grooveRef.current = new Groove();
+
+  useEffect(() => {
+    grooveRef.current?.setStyle(style);
+  }, [style]);
+
+  useEffect(() => {
+    grooveRef.current?.setVolume(volume);
+  }, [volume]);
+
+  // Parar el secuenciador al salir, o se queda sonando
+  useEffect(() => () => grooveRef.current?.stop(), []);
 
   // Las object URL hay que liberarlas a mano o se quedan en memoria
   useEffect(() => {
@@ -61,17 +82,84 @@ export function useCircuitMusic() {
     if (audioRef.current) audioRef.current.volume = volume;
   }, [volume, idx]);
 
-  return { tracks, idx, addFiles, clear, next, volume, setVolume, audioRef };
+  return {
+    source,
+    setSource,
+    style,
+    setStyle,
+    tracks,
+    idx,
+    addFiles,
+    clear,
+    next,
+    volume,
+    setVolume,
+    audioRef,
+    groove: grooveRef,
+  };
 }
 
 type Music = ReturnType<typeof useCircuitMusic>;
 
 /** Selector de pistas, para la pantalla de ajustes. */
 export function MusicPicker({ music }: { music: Music }) {
-  const { tracks, addFiles, clear } = music;
+  const { tracks, addFiles, clear, source, setSource, style, setStyle } = music;
   return (
     <div>
       <p className="label">Música</p>
+
+      <div className="mb-2 flex flex-wrap gap-1.5">
+        {(
+          [
+            ["ritmo", "🥁 Ritmo"],
+            ["mias", "🎵 Mis canciones"],
+            ["ninguna", "🔇 Ninguna"],
+          ] as const
+        ).map(([v, label]) => (
+          <button
+            key={v}
+            onClick={() => setSource(v)}
+            className={`chip ${
+              source === v ? "bg-accent/20 text-accent" : "bg-base-800 text-slate-400"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {source === "ritmo" && (
+        <div>
+          <div className="flex flex-wrap gap-1.5">
+            {GROOVE_STYLES.map((g) => (
+              <button
+                key={g.value}
+                onClick={() => setStyle(g.value)}
+                className={`chip ${
+                  style === g.value ? "bg-gym/20 text-gym" : "bg-base-800 text-slate-400"
+                }`}
+              >
+                {g.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+            {GROOVE_STYLES.find((g) => g.value === style)?.hint}. Se genera en el
+            momento: no hay nada que descargar y acelera o se calma según estés
+            trabajando o descansando.
+          </p>
+        </div>
+      )}
+
+      {source === "ninguna" && (
+        <p className="text-xs leading-relaxed text-slate-500">
+          Sin música propia. Puedes poner tu app de siempre: los avisos del
+          cronómetro se oyen por encima sin cortarla.
+        </p>
+      )}
+
+      {source === "mias" && (
+      <>
       {tracks.length === 0 ? (
         <p className="mb-2 text-xs leading-relaxed text-slate-500">
           Elige canciones de tu dispositivo y sonarán durante el circuito. No
@@ -99,14 +187,38 @@ export function MusicPicker({ music }: { music: Music }) {
           }}
         />
       </label>
+      </>
+      )}
     </div>
   );
 }
 
 /** Barra de reproducción y el `<audio>` de verdad, para el cronómetro. */
-export function MusicBar({ music, playing }: { music: Music; playing: boolean }) {
-  const { tracks, idx, next, volume, setVolume, audioRef } = music;
+export function MusicBar({
+  music,
+  playing,
+  intense = true,
+}: {
+  music: Music;
+  playing: boolean;
+  /** true durante el trabajo; en descanso el ritmo baja de revoluciones. */
+  intense?: boolean;
+}) {
+  const { tracks, idx, next, volume, setVolume, audioRef, source, style, groove } = music;
   const track = tracks[idx];
+
+  // Ritmo integrado: arranca y para con el cronómetro
+  useEffect(() => {
+    const g = groove.current;
+    if (!g) return;
+    if (source === "ritmo" && playing) g.start();
+    else g.stop();
+  }, [source, playing, groove]);
+
+  // En el descanso el ritmo se calma; en el trabajo va a su tempo
+  useEffect(() => {
+    groove.current?.setTempoScale(intense ? 1 : 0.82);
+  }, [intense, groove]);
 
   // La música sigue al cronómetro: si pausas el circuito, se para.
   // El volumen se aplica aquí y no solo al moverlo, porque el <audio> se monta
@@ -124,6 +236,31 @@ export function MusicBar({ music, playing }: { music: Music; playing: boolean })
     if (el.ended) el.currentTime = 0;
     void el.play().catch(() => {});
   }, [playing, idx, volume, audioRef]);
+
+  if (source === "ninguna") return null;
+
+  if (source === "ritmo") {
+    const label = GROOVE_STYLES.find((g) => g.value === style)?.label ?? "";
+    return (
+      <div className="card flex items-center gap-3 !py-2.5">
+        <span className="text-base">🥁</span>
+        <span className="min-w-0 flex-1 truncate text-xs text-slate-300">
+          Ritmo · {label}
+          {!intense && <span className="text-slate-500"> · en calma</span>}
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={volume}
+          onChange={(e) => setVolume(Number(e.target.value))}
+          className="w-20 shrink-0 accent-accent"
+          aria-label="Volumen de la música"
+        />
+      </div>
+    );
+  }
 
   if (!track) return null;
 

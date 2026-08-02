@@ -30,16 +30,17 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
 - **🔥 Circuitos por estaciones** — entrenamiento tipo **WOD o Hyrox en casa**:
   recorres una lista de estaciones con un tiempo fijo de trabajo, **tiempo de
   transición entre una y otra** y varias rondas. El cronómetro avisa con
-  sonido y vibración en cada cambio, canta la cuenta atrás de los últimos tres
-  segundos y mantiene la pantalla encendida. Seis circuitos listos —Hyrox en
+  sonido y vibración en cada cambio y mantiene la pantalla encendida. Seis circuitos listos —Hyrox en
   casa, WOD exprés, Tabata y tres **con bandas elásticas, cortas y largas**—,
   con rondas y tiempos ajustables, y puedes quitar las estaciones cuyo
   material no tengas, y **ajustar el trabajo y el descanso estación por
   estación**. Cada estación enseña **la imagen del ejercicio**, y al tocarla se
   abre el GIF de la técnica. Una **voz en español** canta la cuenta atrás
   (5, 4, 3, 2, 1) y dice qué estación toca, para no tener que mirar la
-  pantalla. Puedes poner **tus propias canciones** de fondo: se eligen del
-  dispositivo, no se suben a ningún sitio y se paran cuando pausas.
+  pantalla. Y lleva **música**: un ritmo
+  sintetizado en el navegador (tres estilos) que acelera al trabajar y se
+  calma en el descanso, o **tus propias canciones** si prefieres — se eligen
+  del dispositivo y no se suben a ningún sitio.
 - **🗓️ Planes de entrenamiento** — crea tu rutina semanal (días de gimnasio,
   cardio y descanso) e inicia cada sesión con un toque: los ejercicios y las
   series se precargan solos. Los ejercicios se eligen **por imagen**, no

@@ -415,12 +415,15 @@ function Runner({
       // se queda el pitido de siempre.
       if (sec <= 5 && sec > 0 && lastTick.current !== sec) {
         lastTick.current = sec;
+        // Bajar la música mientras se canta la cuenta atrás, o no se oye
+        music.groove.current?.duck(true);
         if (!voiceRef.current || !sayCount(sec)) tick();
       }
+      if (sec > 5) music.groove.current?.duck(false);
       if (ms <= 0) advance(idx + 1);
     }, 100);
     return () => clearInterval(id);
-  }, [endsAt, idx, done, advance]);
+  }, [endsAt, idx, done, advance, music.groove]);
 
   // Mantener la pantalla encendida mientras dura el circuito
   useEffect(() => {
@@ -644,7 +647,7 @@ function Runner({
         </button>
       </div>
 
-      <MusicBar music={music} playing={!paused} />
+      <MusicBar music={music} playing={!paused} intense={step.kind === "work"} />
 
       {detail && (
         <ExerciseEditSheet
