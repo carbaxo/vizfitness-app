@@ -57,6 +57,40 @@ export function tick() {
   beep(660, 90, 0.22);
 }
 
+// ------------------------------------------------------------------- voz
+// La cuenta atrás cantada usa la síntesis de voz del navegador: no hace falta
+// grabar nada ni descargar audio, y va en español. Si el dispositivo no la
+// tiene, el llamante se queda con el pitido.
+
+export const speechAvailable = () =>
+  typeof window !== "undefined" && "speechSynthesis" in window;
+
+/** Dice algo en voz alta, cortando lo que estuviera diciendo. */
+export function say(text: string, { rate = 1.15, volume = 1 } = {}) {
+  if (!speechAvailable()) return false;
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "es-ES";
+    u.rate = rate;
+    u.volume = volume;
+    // Cancelar lo anterior: en una cuenta atrás vale más el número de ahora
+    // que terminar de decir el de hace un segundo.
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(u);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Canta un segundo de la cuenta atrás. Devuelve false si no ha podido hablar,
+ * para que el llamante haga sonar el pitido en su lugar.
+ */
+export function sayCount(sec: number) {
+  return say(sec === 0 ? "¡Ya!" : String(sec), { rate: 1.3 });
+}
+
 /** Cambio de estación: dos pitidos altos y una vibración corta. */
 export function goSignal() {
   beep(1046, 160, 0.32);

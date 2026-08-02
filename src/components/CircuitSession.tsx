@@ -8,10 +8,11 @@ import { isoDate } from "@/lib/stats";
 import { CIRCUIT_TEMPLATES } from "@/lib/circuitTemplates";
 import { STATION_EQUIPMENT } from "@/lib/types";
 import type { Circuit, CircuitStation, StationEquipment, Workout } from "@/lib/types";
-import { finishSignal, goSignal, tick } from "@/lib/beep";
+import { finishSignal, goSignal, say, sayCount, speechAvailable, tick } from "@/lib/beep";
 import { useExerciseIndex } from "@/lib/exerciseLibrary";
 import ExerciseImage from "./ExerciseImage";
 import ExerciseEditSheet from "./ExerciseEditSheet";
+import { MusicBar, MusicPicker, useCircuitMusic } from "./CircuitMusic";
 
 const PREP_SEC = 10;
 
@@ -39,7 +40,8 @@ function buildSteps(circuit: Circuit): Step[] {
       if (i < circuit.stations.length - 1) {
         steps.push({
           kind: "transition",
-          sec: circuit.transitionSec,
+          // El descanso propio de la estación manda sobre el del circuito
+          sec: st.restSec ?? circuit.transitionSec,
           round: r,
           nextStation: i + 1,
         });
@@ -58,22 +60,34 @@ const totalSeconds = (circuit: Circuit) =>
 // ==================================================================== vista
 export default function CircuitSession() {
   const [circuit, setCircuit] = useState<Circuit | null>(null);
+  // Vive aquí para que las canciones elegidas en los ajustes sigan puestas al
+  // arrancar el cronómetro
+  const music = useCircuitMusic();
 
   return circuit ? (
-    <Runner circuit={circuit} onExit={() => setCircuit(null)} />
+    <Runner circuit={circuit} music={music} onExit={() => setCircuit(null)} />
   ) : (
-    <Setup onStart={setCircuit} />
+    <Setup music={music} onStart={setCircuit} />
   );
 }
 
 // ---------------------------------------------------------------- ajustes
-function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
+function Setup({
+  music,
+  onStart,
+}: {
+  music: ReturnType<typeof useCircuitMusic>;
+  onStart: (c: Circuit) => void;
+}) {
   const [pick, setPick] = useState(0);
   const template = CIRCUIT_TEMPLATES[pick];
   const [rounds, setRounds] = useState(template.rounds);
   const [transitionSec, setTransitionSec] = useState(template.transitionSec);
   const [roundRestSec, setRoundRestSec] = useState(template.roundRestSec);
   const [off, setOff] = useState<Set<number>>(new Set());
+  // Tiempos retocados a mano, por índice de estación de la plantilla
+  const [tweak, setTweak] = useState<Record<number, { workSec?: number; restSec?: number }>>({});
+  const [open, setOpen] = useState<number | null>(null);
   const [detail, setDetail] = useState<CircuitStation | null>(null);
   const { find } = useExerciseIndex();
 
@@ -84,9 +98,19 @@ function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
     setTransitionSec(t.transitionSec);
     setRoundRestSec(t.roundRestSec);
     setOff(new Set());
+    setTweak({});
+    setOpen(null);
   };
 
-  const stations = template.stations.filter((_, i) => !off.has(i));
+  const withTweak = (st: CircuitStation, i: number): CircuitStation => ({
+    ...st,
+    workSec: tweak[i]?.workSec ?? st.workSec,
+    ...(tweak[i]?.restSec !== undefined ? { restSec: tweak[i]!.restSec } : {}),
+  });
+
+  const stations = template.stations
+    .map(withTweak)
+    .filter((_, i) => !off.has(i));
   const circuit: Circuit = { ...template, stations, rounds, transitionSec, roundRestSec };
   const mins = Math.round(totalSeconds(circuit) / 60);
 
@@ -147,6 +171,8 @@ function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
           />
         </div>
 
+        <MusicPicker music={music} />
+
         <div>
           <p className="label">Material</p>
           <div className="flex flex-wrap gap-1.5">
@@ -163,15 +189,20 @@ function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
 
         <div>
           <p className="label">
-            Estaciones · toca para quitar la que no puedas hacer
+            Estaciones · toca para quitar la que no puedas hacer, ⏱ para
+            cambiarle los tiempos
           </p>
           <div className="space-y-1.5">
             {template.stations.map((st, i) => {
               const disabled = off.has(i);
               const eq = equipmentOf(st.equipment);
+              const work = tweak[i]?.workSec ?? st.workSec;
+              const rest = tweak[i]?.restSec ?? st.restSec ?? transitionSec;
+              const setTw = (patch: { workSec?: number; restSec?: number }) =>
+                setTweak((t) => ({ ...t, [i]: { ...t[i], ...patch } }));
               return (
+                <div key={i}>
                 <div
-                  key={i}
                   className={`flex items-center gap-2 rounded-xl border px-2 py-1.5 transition ${
                     disabled
                       ? "border-base-700 opacity-45"
@@ -208,9 +239,40 @@ function Setup({ onStart }: { onStart: (c: Circuit) => void }) {
                       {eq.emoji} {st.name}
                     </span>
                     <span className="block text-[11px] text-slate-500">
-                      {st.reps ?? `${st.workSec}s`}
+                      {st.reps ?? `${work}s`} · descanso {rest}s
                     </span>
                   </button>
+                  <button
+                    onClick={() => setOpen(open === i ? null : i)}
+                    className="press grid h-8 w-8 shrink-0 place-items-center rounded-full text-slate-500 hover:text-slate-200"
+                    aria-label={`Ajustar tiempos de ${st.name}`}
+                    aria-expanded={open === i}
+                  >
+                    ⏱
+                  </button>
+                </div>
+                {open === i && (
+                  <div className="mt-1.5 grid grid-cols-2 gap-3 rounded-xl border border-base-700 bg-base-900/60 px-3 py-2">
+                    <Field
+                      label="Trabajo"
+                      value={work}
+                      min={5}
+                      max={300}
+                      step={5}
+                      suffix="s"
+                      onChange={(v) => setTw({ workSec: v })}
+                    />
+                    <Field
+                      label="Descanso"
+                      value={rest}
+                      min={0}
+                      max={300}
+                      step={5}
+                      suffix="s"
+                      onChange={(v) => setTw({ restSec: v })}
+                    />
+                  </div>
+                )}
                 </div>
               );
             })}
@@ -283,7 +345,15 @@ function Field({
 }
 
 // ------------------------------------------------------------ cronómetro
-function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
+function Runner({
+  circuit,
+  music,
+  onExit,
+}: {
+  circuit: Circuit;
+  music: ReturnType<typeof useCircuitMusic>;
+  onExit: () => void;
+}) {
   const { user } = useAuth();
   const router = useRouter();
   const steps = useMemo(() => buildSteps(circuit), [circuit]);
@@ -296,8 +366,11 @@ function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
   const [saving, setSaving] = useState(false);
   const [startedAt] = useState(() => Date.now());
   const [detail, setDetail] = useState<CircuitStation | null>(null);
+  const [voice, setVoice] = useState(true);
   const { find } = useExerciseIndex();
   const lastTick = useRef<number>(-1);
+  const voiceRef = useRef(voice);
+  voiceRef.current = voice;
 
   const step = steps[Math.min(idx, steps.length - 1)];
   const paused = endsAt === null;
@@ -316,8 +389,17 @@ function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
       setEndsAt(Date.now() + steps[to].sec * 1000);
       lastTick.current = -1;
       goSignal();
+      // Y se dice qué toca, que es lo que evita tener que mirar la pantalla
+      const nxt = steps[to];
+      if (voiceRef.current) {
+        if (nxt.kind === "work") {
+          setTimeout(() => say(circuit.stations[nxt.station].name), 420);
+        } else if (nxt.kind === "roundRest") {
+          setTimeout(() => say("Descanso"), 420);
+        }
+      }
     },
-    [steps]
+    [steps, circuit.stations]
   );
 
   // Un único intervalo. El tiempo restante se calcula contra un instante
@@ -329,9 +411,11 @@ function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
       const ms = endsAt - Date.now();
       const sec = Math.max(0, Math.ceil(ms / 1000));
       setRemaining(sec);
-      if (sec <= 3 && sec > 0 && lastTick.current !== sec) {
+      // Últimos cinco segundos: se cantan. Si el dispositivo no tiene voz,
+      // se queda el pitido de siempre.
+      if (sec <= 5 && sec > 0 && lastTick.current !== sec) {
         lastTick.current = sec;
-        tick();
+        if (!voiceRef.current || !sayCount(sec)) tick();
       }
       if (ms <= 0) advance(idx + 1);
     }, 100);
@@ -548,6 +632,19 @@ function Runner({ circuit, onExit }: { circuit: Circuit; onExit: () => void }) {
           Terminar
         </button>
       </div>
+
+      <div className="flex items-center justify-center">
+        <button
+          onClick={() => setVoice((v) => !v)}
+          className={`chip ${voice ? "bg-accent/15 text-accent" : "bg-base-800 text-slate-500"}`}
+          aria-pressed={voice}
+          disabled={!speechAvailable()}
+        >
+          {voice ? "🔊 Voz activada" : "🔇 Voz desactivada"}
+        </button>
+      </div>
+
+      <MusicBar music={music} playing={!paused} />
 
       {detail && (
         <ExerciseEditSheet
