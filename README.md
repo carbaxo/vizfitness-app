@@ -34,8 +34,12 @@ El proyecto tiene dos aplicaciones que comparten cuenta y datos:
   segundos y mantiene la pantalla encendida. Seis circuitos listos —Hyrox en
   casa, WOD exprés, Tabata y tres **con bandas elásticas, cortas y largas**—,
   con rondas y tiempos ajustables, y puedes quitar las estaciones cuyo
-  material no tengas. Cada estación enseña **la imagen del ejercicio**, y al
-  tocarla se abre el GIF de la técnica.
+  material no tengas, y **ajustar el trabajo y el descanso estación por
+  estación**. Cada estación enseña **la imagen del ejercicio**, y al tocarla se
+  abre el GIF de la técnica. Una **voz en español** canta la cuenta atrás
+  (5, 4, 3, 2, 1) y dice qué estación toca, para no tener que mirar la
+  pantalla. Puedes poner **tus propias canciones** de fondo: se eligen del
+  dispositivo, no se suben a ningún sitio y se paran cuando pausas.
 - **🗓️ Planes de entrenamiento** — crea tu rutina semanal (días de gimnasio,
   cardio y descanso) e inicia cada sesión con un toque: los ejercicios y las
   series se precargan solos. Los ejercicios se eligen **por imagen**, no

@@ -137,6 +137,12 @@ export interface CircuitStation {
   libraryName?: string;
   /** Duración de la estación. Si hay `reps`, el tiempo es solo el tope. */
   workSec: number;
+  /**
+   * Descanso DESPUÉS de esta estación. Si no está, se usa el `transitionSec`
+   * del circuito: no todas las estaciones cuestan lo mismo de montar —cambiar
+   * el anclaje de una banda lleva más que soltar una mancuerna.
+   */
+  restSec?: number;
   reps?: string;
   /** Cómo montarla o en qué fijarse: anclaje de la banda, tempo, postura… */
   note?: string;
