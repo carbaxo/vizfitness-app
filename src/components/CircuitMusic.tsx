@@ -242,7 +242,7 @@ export function MusicBar({
   if (source === "ritmo") {
     const label = GROOVE_STYLES.find((g) => g.value === style)?.label ?? "";
     return (
-      <div className="card flex items-center gap-3 !py-2.5">
+      <div className="card flex items-center gap-3 !py-2.5 [@media(max-height:560px)]:!py-1">
         <span className="text-base">🥁</span>
         <span className="min-w-0 flex-1 truncate text-xs text-slate-300">
           Ritmo · {label}
@@ -265,7 +265,7 @@ export function MusicBar({
   if (!track) return null;
 
   return (
-    <div className="card flex items-center gap-3 !py-2.5">
+    <div className="card flex items-center gap-3 !py-2.5 [@media(max-height:560px)]:!py-1">
       <audio
         ref={audioRef}
         src={track.url}
