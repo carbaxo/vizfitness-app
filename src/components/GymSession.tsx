@@ -8,6 +8,7 @@ import { useExerciseLibrary } from "@/lib/exerciseLibrary";
 import { isoDate, workoutVolumeKg } from "@/lib/stats";
 import type { SetEntry, Workout, WorkoutExercise } from "@/lib/types";
 import ExerciseImage from "./ExerciseImage";
+import FavStar, { useFavorites } from "./FavStar";
 import RestTimer from "./RestTimer";
 
 export default function GymSession() {
@@ -17,6 +18,7 @@ export default function GymSession() {
   const { data: customExercises } = useCustomExercises();
   const { library } = useExerciseLibrary();
   const { data: plans } = usePlans();
+  const { isFavorite, toggle, favorites } = useFavorites();
 
   const [name, setName] = useState("Sesión de gimnasio");
   const [exercises, setExercises] = useState<WorkoutExercise[]>([]);
@@ -54,10 +56,19 @@ export default function GymSession() {
   const allExercises = useMemo(() => {
     const custom = customExercises.map((e) => ({ ...e, custom: true }));
     const q = search.toLowerCase();
-    return [...custom, ...library]
-      .filter((e) => e.name.toLowerCase().includes(q))
-      .slice(0, 60);
-  }, [customExercises, library, search]);
+    const pool = [...custom, ...library].filter((e) =>
+      e.name.toLowerCase().includes(q)
+    );
+    // Sin búsqueda, los favoritos van los primeros: es lo que se añade una y
+    // otra vez, y son 1.324 ejercicios como para ir a buscarlos cada vez.
+    if (!q) {
+      const favNames = new Set(favorites.map((f) => f.name));
+      const favs = pool.filter((e) => favNames.has(e.name));
+      const rest = pool.filter((e) => !favNames.has(e.name));
+      return [...favs, ...rest].slice(0, 60);
+    }
+    return pool.slice(0, 60);
+  }, [customExercises, library, search, favorites]);
 
   const addExerciseToSession = (exName: string, muscleGroup?: WorkoutExercise["muscleGroup"]) => {
     setExercises((xs) => [
@@ -250,22 +261,28 @@ export default function GymSession() {
           />
           <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
             {allExercises.map((e, i) => (
-              <button
-                key={`${e.name}-${i}`}
-                onClick={() => addExerciseToSession(e.name, e.muscleGroup)}
-                className="flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-base-800"
-              >
-                <ExerciseImage
-                  media={e.media}
-                  alt={e.name}
-                  className="h-10 w-10 shrink-0 rounded-lg"
-                />
-                <span className="min-w-0 flex-1 truncate">
-                  {e.name}
-                  {e.custom && <span className="ml-2 chip bg-accent/15 text-accent">propio</span>}
-                </span>
-                <span className="shrink-0 text-xs capitalize text-slate-500">{e.muscleGroup}</span>
-              </button>
+              <div key={`${e.name}-${i}`} className="flex items-center gap-1">
+                <button
+                  onClick={() => addExerciseToSession(e.name, e.muscleGroup)}
+                  className="flex min-w-0 flex-1 items-center gap-3 rounded-lg px-2 py-1.5 text-left text-sm hover:bg-base-800"
+                >
+                  <ExerciseImage
+                    media={e.media}
+                    alt={e.name}
+                    className="h-10 w-10 shrink-0 rounded-lg"
+                  />
+                  <span className="min-w-0 flex-1 truncate">
+                    {e.name}
+                    {e.custom && (
+                      <span className="ml-2 chip bg-accent/15 text-accent">propio</span>
+                    )}
+                  </span>
+                  <span className="shrink-0 text-xs capitalize text-slate-500">
+                    {e.muscleGroup}
+                  </span>
+                </button>
+                <FavStar size="sm" active={isFavorite(e.name)} onToggle={() => toggle(e)} />
+              </div>
             ))}
             {search && (
               <button
