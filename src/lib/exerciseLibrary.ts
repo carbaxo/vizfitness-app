@@ -38,7 +38,9 @@ interface RawExercise {
 
 function datasetUrl() {
   const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-  return `${base}/data/exercises.json`;
+  // La versión evita que el navegador/PWA reutilice una copia anterior del
+  // catálogo después de un despliegue en GitHub Pages.
+  return `${base}/data/exercises.json?v=20260803-2`;
 }
 
 // Caché a nivel de módulo: el dataset se descarga una sola vez por sesión y se
@@ -49,7 +51,7 @@ let inflight: Promise<Exercise[]> | null = null;
 function loadDataset(): Promise<Exercise[]> {
   if (cache) return Promise.resolve(cache);
   if (inflight) return inflight;
-  inflight = fetch(datasetUrl())
+  inflight = fetch(datasetUrl(), { cache: "no-store" })
     .then((r) => (r.ok ? r.json() : []))
     .then((rows: RawExercise[]) =>
       rows.map<Exercise>((r) => ({
