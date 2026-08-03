@@ -80,6 +80,7 @@ export function generateSession(preferences: SessionPreferences, library: Exerci
       cardioMinutes: preferences.focus !== "musculacion" ? Math.round(preferences.durationMin * 0.4) : 0,
       profileId: preferences.profileId,
       profileName: preferences.profileName,
+      preferences,
     };
   }
 
@@ -103,5 +104,34 @@ export function generateSession(preferences: SessionPreferences, library: Exerci
     rounds: circuit ? sets : undefined,
     profileId: preferences.profileId,
     profileName: preferences.profileName,
+    preferences,
   };
+}
+
+export function replaceSessionExercise(session: GeneratedSession, index: number, library: Exercise[], requestedName?: string) {
+  const current = session.exercises[index];
+  if (!current) return session;
+  const currentLibraryExercise = library.find((exercise) => exercise.name === current.name);
+  const requested = requestedName ? library.find((exercise) => exercise.name === requestedName) : undefined;
+  const suggested = requested ?? shuffle(library.filter((exercise) =>
+    exercise.name !== current.name &&
+    exercise.muscleGroup === (currentLibraryExercise?.muscleGroup ?? current.muscleGroup) &&
+    equipmentMatches(exercise, session.preferences.equipment)
+  ))[0];
+  if (!suggested) return session;
+
+  return {
+    ...session,
+    exercises: session.exercises.map((exercise, exerciseIndex) => exerciseIndex === index ? { ...exercise, name: suggested.name, muscleGroup: suggested.muscleGroup } : exercise),
+    stations: session.stations?.map((station, stationIndex) => stationIndex === index ? { ...station, name: suggested.name, muscleGroup: suggested.muscleGroup } : station),
+  };
+}
+
+export function regenerateSession(session: GeneratedSession, library: Exercise[]) {
+  const currentNames = session.exercises.map((exercise) => exercise.name).join("|");
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const alternative = generateSession(session.preferences, library);
+    if (alternative.exercises.map((exercise) => exercise.name).join("|") !== currentNames) return alternative;
+  }
+  return replaceSessionExercise(session, 0, library);
 }
