@@ -4,8 +4,8 @@
   "description": "Registra cardio y gimnasio, crea planes de entrenamiento y sigue tu progreso desde cualquier dispositivo.",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#07100d",
-  "theme_color": "#07100d",
+  "background_color": "#110d0a",
+  "theme_color": "#110d0a",
   "lang": "es",
   "icons": [
     {

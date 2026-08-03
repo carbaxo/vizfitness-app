@@ -1,11 +1,12 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
+import ExerciseImage from "@/components/ExerciseImage";
+import ExerciseDetailView from "@/components/ExerciseDetailView";
 import { useAuth } from "@/context/AuthContext";
 import { addExercise, deleteExercise, useCustomExercises } from "@/lib/db";
-import { EXERCISE_LIBRARY } from "@/lib/exercisesSeed";
+import { useExerciseLibrary } from "@/lib/exerciseLibrary";
 import { MUSCLE_GROUPS, type Exercise, type MuscleGroup } from "@/lib/types";
 import Icon from "@/components/Icon";
 
@@ -20,8 +21,10 @@ export default function EjerciciosPage() {
 function Ejercicios() {
   const { user } = useAuth();
   const { data: custom } = useCustomExercises();
+  const { library, loading } = useExerciseLibrary();
   const [group, setGroup] = useState<MuscleGroup | "todos">("todos");
   const [search, setSearch] = useState("");
+  const [detail, setDetail] = useState<Exercise | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState("");
   const [newGroup, setNewGroup] = useState<MuscleGroup>("pecho");
@@ -29,15 +32,21 @@ function Ejercicios() {
   const [instructions, setInstructions] = useState("");
 
   const all: Exercise[] = useMemo(
-    () => [...custom.map((e) => ({ ...e, custom: true })), ...EXERCISE_LIBRARY],
-    [custom]
+    () => [...custom.map((e) => ({ ...e, custom: true })), ...library],
+    [custom, library]
   );
 
-  const filtered = all.filter(
-    (e) =>
-      (group === "todos" || e.muscleGroup === group) &&
-      e.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return all.filter(
+      (e) =>
+        (group === "todos" || e.muscleGroup === group) &&
+        (q === "" ||
+          e.name.toLowerCase().includes(q) ||
+          e.equipment?.toLowerCase().includes(q) ||
+          e.target?.toLowerCase().includes(q))
+    );
+  }, [all, group, search]);
 
   const create = async () => {
     if (!user || !name.trim()) return;
@@ -57,7 +66,7 @@ function Ejercicios() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <div><p className="section-kicker">Técnica y movimiento</p><h1 className="text-3xl font-extrabold tracking-tight">Biblioteca de ejercicios</h1><p className="mt-1 text-sm text-slate-400">Encuentra el ejercicio adecuado y revisa sus claves técnicas.</p></div>
+        <div><p className="section-kicker">Técnica y movimiento</p><h1 className="text-3xl font-extrabold tracking-tight">Biblioteca de ejercicios</h1><p className="mt-1 text-sm text-slate-400">{loading ? "Cargando ejercicios…" : `${all.length.toLocaleString("es-ES")} ejercicios con imágenes y técnica animada`}</p></div>
         <button onClick={() => setShowForm((s) => !s)} className="btn-primary">
           {showForm ? "Cancelar" : "+ Crear"}
         </button>
@@ -130,44 +139,38 @@ function Ejercicios() {
         ))}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         {filtered.map((e, i) => (
-          <article key={`${e.name}-${i}`} className="exercise-card card group overflow-hidden !p-0 transition hover:-translate-y-0.5 hover:border-accent/35">
-            <div className="relative h-32 overflow-hidden bg-base-800">
-              <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/strength-training.webp`} alt="" className="h-full w-full object-cover opacity-65 transition duration-300 group-hover:scale-105" style={{ objectPosition: `${35 + (i % 3) * 20}% ${35 + (i % 2) * 30}%` }} />
-              <div className="absolute inset-0 bg-gradient-to-t from-base-900 via-base-900/20 to-transparent" />
-              <span className="absolute bottom-3 left-3 chip bg-black/45 capitalize text-white backdrop-blur">{e.muscleGroup}</span>
+          <button key={`${e.id ?? e.name}-${i}`} onClick={() => setDetail(e)} className="exercise-card card press group overflow-hidden !p-0 text-left transition hover:-translate-y-0.5 hover:border-accent/40">
+            <div className="relative aspect-square overflow-hidden bg-white">
+              <ExerciseImage media={e.media} alt={e.name} className="h-full w-full transition-transform duration-300 group-hover:scale-105" />
+              {e.custom && <span className="absolute right-2 top-2 chip bg-accent/90 text-[10px] text-base-950">propio</span>}
             </div>
-            <div className="p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                <p className="font-semibold">
-                  {e.name}
-                  {e.custom && (
-                    <span className="ml-2 chip bg-accent/15 text-accent">propio</span>
-                  )}
-                </p>
-                <p className="text-xs text-slate-500">{e.equipment ?? "Sin material"}</p>
-              </div>
-              {e.custom && e.id && (
-                <button
-                  onClick={() => user && deleteExercise(user.uid, e.id!)}
-                  className="text-xs text-red-400 hover:underline"
-                >
-                  Eliminar
-                </button>
-              )}
-              </div>
-            {e.instructions && (
-              <p className="mt-2 text-sm text-slate-400">{e.instructions}</p>
-            )}
+            <div className="p-3">
+              <p className="line-clamp-2 text-sm font-semibold leading-tight">{e.name}</p>
+              <p className="mt-1 text-xs capitalize text-slate-400">{e.muscleGroup}{e.equipment ? ` · ${e.equipment}` : ""}</p>
             </div>
-          </article>
+          </button>
         ))}
-        {filtered.length === 0 && (
-          <p className="text-sm text-slate-400">No hay ejercicios que coincidan.</p>
+        {!loading && filtered.length === 0 && (
+          <p className="col-span-full text-sm text-slate-400">No hay ejercicios que coincidan.</p>
         )}
       </div>
+
+      {detail && (
+        <div className="sheet-backdrop" onClick={() => setDetail(null)}>
+          <div className="sheet" onClick={(event) => event.stopPropagation()}>
+            <div className="grabber" />
+            <div className="relative min-h-0 flex-1 overflow-y-auto scroll-momentum">
+              <button onClick={() => setDetail(null)} className="press absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-black/55 text-white backdrop-blur" aria-label="Cerrar">✕</button>
+              <ExerciseDetailView name={detail.name} exercise={detail} />
+              {detail.custom && detail.id && (
+                <div className="px-5 pb-5"><button onClick={() => { if (user) deleteExercise(user.uid, detail.id!); setDetail(null); }} className="btn-danger w-full">Eliminar ejercicio</button></div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

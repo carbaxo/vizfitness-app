@@ -21,9 +21,10 @@ const SECONDARY_NAV: { href: string; label: string; icon: IconName }[] = [
 ];
 
 function Logo() {
+  const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   return (
     <div className="flex items-center gap-2.5">
-      <span className="brand-mark"><Icon name="chart" className="h-5 w-5" /></span>
+      <img src={`${base}/brand/viz-mark.svg`} alt="VizFitness" className="brand-mark" />
       <span className="text-lg font-extrabold uppercase tracking-[-0.04em]">
         Viz<span className="text-accent">Fitness</span>
       </span>
@@ -33,10 +34,11 @@ function Logo() {
 
 function LoginScreen() {
   const { signInWithGoogle, configured } = useAuth();
+  const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-      <div className="mb-6"><span className="brand-mark !h-16 !w-16 !rounded-2xl"><Icon name="chart" className="h-8 w-8" /></span></div>
+      <div className="mb-6"><img src={`${base}/brand/viz-mark.svg`} alt="VizFitness" className="brand-mark !h-16 !w-16 !rounded-2xl" /></div>
       <h1 className="text-4xl font-extrabold uppercase tracking-[-0.05em]">
         Viz<span className="text-accent">Fitness</span>
       </h1>
@@ -91,7 +93,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <div className="brand-mark animate-pulse"><Icon name="chart" className="h-5 w-5" /></div>
+        <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/brand/viz-mark.svg`} alt="" className="brand-mark animate-pulse" />
       </main>
     );
   }

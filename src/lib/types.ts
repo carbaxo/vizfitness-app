@@ -6,7 +6,9 @@ export type MuscleGroup =
   | "hombro"
   | "biceps"
   | "triceps"
+  | "antebrazo"
   | "core"
+  | "cardio"
   | "cuerpo completo"
   | "otro";
 
@@ -18,7 +20,9 @@ export const MUSCLE_GROUPS: MuscleGroup[] = [
   "hombro",
   "biceps",
   "triceps",
+  "antebrazo",
   "core",
+  "cardio",
   "cuerpo completo",
   "otro",
 ];
@@ -30,6 +34,11 @@ export interface Exercise {
   equipment?: string;
   instructions?: string;
   custom?: boolean;
+  steps?: string[];
+  bodyPart?: string;
+  target?: string;
+  secondary?: string[];
+  media?: string;
 }
 
 export interface SetEntry {

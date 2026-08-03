@@ -13,12 +13,12 @@ const config: Config = {
           600: "#2b3d52",
         },
         accent: {
-          DEFAULT: "#34d399",
-          dark: "#059669",
-          soft: "#6ee7b7",
+          DEFAULT: "#fb7a29",
+          dark: "#d95716",
+          soft: "#ffae6b",
         },
-        cardio: "#f97316",
-        gym: "#38bdf8",
+        cardio: "#f6bf6f",
+        gym: "#6aaee8",
       },
       fontFamily: {
         sans: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
