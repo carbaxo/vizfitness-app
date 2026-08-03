@@ -13,6 +13,7 @@ import {
   useWorkouts,
 } from "@/lib/db";
 import { formatDateShort, isoDate } from "@/lib/stats";
+import Icon from "@/components/Icon";
 
 export default function PerfilPage() {
   return (
@@ -64,9 +65,9 @@ function Perfil() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Perfil</h1>
+      <div><p className="section-kicker">Cuenta y preferencias</p><h1 className="text-3xl font-extrabold tracking-tight">Perfil</h1></div>
 
-      <div className="card flex items-center gap-4">
+      <div className="card relative flex items-center gap-4 overflow-hidden !p-6 before:absolute before:inset-y-0 before:left-0 before:w-1 before:bg-accent">
         {user?.photoURL ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -90,7 +91,7 @@ function Perfil() {
       </div>
 
       <div className="card space-y-3">
-        <h2 className="font-semibold">⚖️ Peso corporal</h2>
+        <h2 className="section-title">Peso corporal</h2>
         <div className="flex flex-wrap gap-3">
           <input
             className="input max-w-[150px]"
@@ -133,13 +134,13 @@ function Perfil() {
       <GpxImport />
 
       <div className="card space-y-3">
-        <h2 className="font-semibold">📦 Tus datos</h2>
+        <h2 className="section-title">Tus datos</h2>
         <p className="text-sm text-slate-400">
           {workouts.length} entrenamientos · {plans.length} planes · {goals.length}{" "}
           objetivos · {metrics.length} registros de peso
         </p>
         <button onClick={exportData} className="btn-secondary">
-          ⬇️ Exportar todos mis datos (JSON)
+          <Icon name="arrow" className="h-4 w-4 rotate-90" /> Exportar todos mis datos (JSON)
         </button>
       </div>
 

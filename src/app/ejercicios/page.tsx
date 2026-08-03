@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useMemo, useState } from "react";
@@ -6,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { addExercise, deleteExercise, useCustomExercises } from "@/lib/db";
 import { EXERCISE_LIBRARY } from "@/lib/exercisesSeed";
 import { MUSCLE_GROUPS, type Exercise, type MuscleGroup } from "@/lib/types";
+import Icon from "@/components/Icon";
 
 export default function EjerciciosPage() {
   return (
@@ -55,7 +57,7 @@ function Ejercicios() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Biblioteca de ejercicios</h1>
+        <div><p className="section-kicker">Técnica y movimiento</p><h1 className="text-3xl font-extrabold tracking-tight">Biblioteca de ejercicios</h1><p className="mt-1 text-sm text-slate-400">Encuentra el ejercicio adecuado y revisa sus claves técnicas.</p></div>
         <button onClick={() => setShowForm((s) => !s)} className="btn-primary">
           {showForm ? "Cancelar" : "+ Crear"}
         </button>
@@ -102,16 +104,12 @@ function Ejercicios() {
         </div>
       )}
 
-      <input
-        className="input"
-        placeholder="🔍 Buscar ejercicio…"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <div className="relative"><Icon name="book" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input aria-label="Buscar ejercicio" className="input !pl-10" placeholder="Buscar ejercicio…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
 
       <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setGroup("todos")}
+          aria-pressed={group === "todos"}
           className={`chip capitalize ${
             group === "todos" ? "bg-accent/20 text-accent" : "bg-base-800 text-slate-400"
           }`}
@@ -122,6 +120,7 @@ function Ejercicios() {
           <button
             key={g}
             onClick={() => setGroup(g)}
+            aria-pressed={group === g}
             className={`chip capitalize ${
               group === g ? "bg-accent/20 text-accent" : "bg-base-800 text-slate-400"
             }`}
@@ -131,21 +130,24 @@ function Ejercicios() {
         ))}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {filtered.map((e, i) => (
-          <div key={`${e.name}-${i}`} className="card">
-            <div className="flex items-start justify-between gap-2">
-              <div>
+          <article key={`${e.name}-${i}`} className="exercise-card card group overflow-hidden !p-0 transition hover:-translate-y-0.5 hover:border-accent/35">
+            <div className="relative h-32 overflow-hidden bg-base-800">
+              <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/strength-training.webp`} alt="" className="h-full w-full object-cover opacity-65 transition duration-300 group-hover:scale-105" style={{ objectPosition: `${35 + (i % 3) * 20}% ${35 + (i % 2) * 30}%` }} />
+              <div className="absolute inset-0 bg-gradient-to-t from-base-900 via-base-900/20 to-transparent" />
+              <span className="absolute bottom-3 left-3 chip bg-black/45 capitalize text-white backdrop-blur">{e.muscleGroup}</span>
+            </div>
+            <div className="p-4">
+              <div className="flex items-start justify-between gap-2">
+                <div>
                 <p className="font-semibold">
                   {e.name}
                   {e.custom && (
                     <span className="ml-2 chip bg-accent/15 text-accent">propio</span>
                   )}
                 </p>
-                <p className="text-xs capitalize text-slate-400">
-                  {e.muscleGroup}
-                  {e.equipment ? ` · ${e.equipment}` : ""}
-                </p>
+                <p className="text-xs text-slate-500">{e.equipment ?? "Sin material"}</p>
               </div>
               {e.custom && e.id && (
                 <button
@@ -155,11 +157,12 @@ function Ejercicios() {
                   Eliminar
                 </button>
               )}
-            </div>
+              </div>
             {e.instructions && (
               <p className="mt-2 text-sm text-slate-400">{e.instructions}</p>
             )}
-          </div>
+            </div>
+          </article>
         ))}
         {filtered.length === 0 && (
           <p className="text-sm text-slate-400">No hay ejercicios que coincidan.</p>

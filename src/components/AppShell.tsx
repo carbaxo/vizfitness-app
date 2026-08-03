@@ -1,24 +1,31 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
+import Icon, { type IconName } from "@/components/Icon";
 
-const NAV = [
-  { href: "/", label: "Inicio", icon: "🏠" },
-  { href: "/entrenar", label: "Entrenar", icon: "🏋️" },
-  { href: "/planes", label: "Planes", icon: "🗓️" },
-  { href: "/progreso", label: "Progreso", icon: "📈" },
-  { href: "/perfil", label: "Perfil", icon: "👤" },
+const NAV: { href: string; label: string; icon: IconName }[] = [
+  { href: "/", label: "Inicio", icon: "home" },
+  { href: "/entrenar", label: "Entrenar", icon: "dumbbell" },
+  { href: "/planes", label: "Planes", icon: "calendar" },
+  { href: "/progreso", label: "Progreso", icon: "chart" },
+  { href: "/perfil", label: "Perfil", icon: "user" },
+];
+
+const SECONDARY_NAV: { href: string; label: string; icon: IconName }[] = [
+  { href: "/ejercicios", label: "Ejercicios", icon: "book" },
+  { href: "/historial", label: "Historial", icon: "history" },
 ];
 
 function Logo() {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-2xl">💪</span>
-      <span className="text-lg font-bold tracking-tight">
-        RCV <span className="text-accent">Tracker</span>
+    <div className="flex items-center gap-2.5">
+      <span className="brand-mark"><Icon name="chart" className="h-5 w-5" /></span>
+      <span className="text-lg font-extrabold uppercase tracking-[-0.04em]">
+        Viz<span className="text-accent">Fitness</span>
       </span>
     </div>
   );
@@ -29,9 +36,9 @@ function LoginScreen() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-6 text-center">
-      <div className="mb-6 text-6xl">💪</div>
-      <h1 className="text-3xl font-bold">
-        RCV <span className="text-accent">Tracker</span>
+      <div className="mb-6"><span className="brand-mark !h-16 !w-16 !rounded-2xl"><Icon name="chart" className="h-8 w-8" /></span></div>
+      <h1 className="text-4xl font-extrabold uppercase tracking-[-0.05em]">
+        Viz<span className="text-accent">Fitness</span>
       </h1>
       <p className="mt-3 max-w-md text-slate-400">
         Registra tus entrenamientos de cardio y gimnasio, crea planes de
@@ -69,9 +76,9 @@ function LoginScreen() {
       )}
 
       <div className="mt-10 grid max-w-lg grid-cols-3 gap-3 text-xs text-slate-400">
-        <div className="card !p-3">🏃 Cardio con ritmo y distancia</div>
-        <div className="card !p-3">🏋️ Gimnasio con series y récords</div>
-        <div className="card !p-3">🗓️ Planes de entrenamiento</div>
+        <div className="card !p-3"><Icon name="run" className="mx-auto mb-2 h-5 w-5 text-cardio" />Cardio y distancia</div>
+        <div className="card !p-3"><Icon name="dumbbell" className="mx-auto mb-2 h-5 w-5 text-gym" />Fuerza y récords</div>
+        <div className="card !p-3"><Icon name="calendar" className="mx-auto mb-2 h-5 w-5 text-accent" />Planes semanales</div>
       </div>
     </main>
   );
@@ -84,7 +91,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <div className="animate-pulse text-4xl">💪</div>
+        <div className="brand-mark animate-pulse"><Icon name="chart" className="h-5 w-5" /></div>
       </main>
     );
   }
@@ -92,9 +99,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
   if (!user) return <LoginScreen />;
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-6xl">
+    <div className="mx-auto flex min-h-screen max-w-[1440px]">
       {/* Barra lateral en escritorio */}
-      <aside className="sticky top-0 hidden h-screen w-56 flex-col gap-1 border-r border-base-700/60 p-4 md:flex">
+      <aside className="app-sidebar sticky top-0 hidden h-screen w-64 shrink-0 flex-col gap-1 border-r border-base-700/60 p-5 md:flex">
         <div className="mb-6 px-2 pt-2">
           <Logo />
         </div>
@@ -105,29 +112,47 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-accent/15 text-accent"
-                  : "text-slate-300 hover:bg-base-800"
+                className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-all ${
+                  active
+                  ? "bg-accent/15 text-accent shadow-[inset_0_0_0_1px_rgba(52,211,153,.12)]"
+                  : "text-slate-400 hover:bg-base-800/80 hover:text-slate-100"
               }`}
             >
-              <span>{item.icon}</span>
+              <Icon name={item.icon} className="h-5 w-5" />
               {item.label}
             </Link>
           );
         })}
+        <p className="mb-1 mt-6 px-3 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-600">Explorar</p>
+        {SECONDARY_NAV.map((item) => {
+          const active = pathname.startsWith(item.href);
+          return (
+            <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-all ${active ? "bg-accent/15 text-accent" : "text-slate-400 hover:bg-base-800/80 hover:text-slate-100"}`}>
+              <Icon name={item.icon} className="h-5 w-5" />{item.label}
+            </Link>
+          );
+        })}
+        <div className="mt-auto rounded-2xl border border-base-700/50 bg-base-900/70 p-3">
+          <div className="flex items-center gap-3">
+            {user?.photoURL ? <img src={user.photoURL} alt="" className="h-9 w-9 rounded-xl object-cover" referrerPolicy="no-referrer" /> : <span className="grid h-9 w-9 place-items-center rounded-xl bg-base-700"><Icon name="user" className="h-4 w-4" /></span>}
+            <div className="min-w-0"><p className="truncate text-sm font-semibold">{user?.displayName ?? "Atleta"}</p><p className="truncate text-[11px] text-slate-500">Cuenta sincronizada</p></div>
+          </div>
+        </div>
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Cabecera en móvil */}
-        <header className="flex items-center justify-between border-b border-base-700/60 px-4 py-3 md:hidden">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-base-700/60 bg-base-950/85 px-4 py-3 backdrop-blur-xl md:hidden">
           <Logo />
+          <div className="flex items-center gap-1">
+            {SECONDARY_NAV.map((item) => <Link key={item.href} href={item.href} aria-label={item.label} className="rounded-xl p-2 text-slate-400 hover:bg-base-800 hover:text-accent"><Icon name={item.icon} className="h-5 w-5" /></Link>)}
+          </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:pb-8">{children}</main>
+        <main className="app-content flex-1 px-4 py-5 pb-24 md:px-8 md:py-8 md:pb-10">{children}</main>
 
         {/* Navegación inferior en móvil */}
-        <nav className="fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-base-700/60 bg-base-900/95 py-2 backdrop-blur md:hidden">
+        <nav className="app-mobile-nav fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-base-700/60 pt-2 md:hidden">
           {NAV.map((item) => {
             const active =
               item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
@@ -139,7 +164,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   active ? "text-accent" : "text-slate-400"
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                <Icon name={item.icon} className="h-5 w-5" />
                 {item.label}
               </Link>
             );

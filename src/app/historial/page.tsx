@@ -4,6 +4,7 @@ import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import WorkoutCard from "@/components/WorkoutCard";
 import { useWorkouts } from "@/lib/db";
+import Icon from "@/components/Icon";
 
 export default function HistorialPage() {
   return (
@@ -21,7 +22,7 @@ function Historial() {
 
   return (
     <div className="space-y-5">
-      <h1 className="text-2xl font-bold">Historial</h1>
+      <div><p className="section-kicker">Tu actividad</p><h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight"><Icon name="history" className="h-7 w-7 text-accent" />Historial</h1><p className="mt-1 text-sm text-slate-400">Todas tus sesiones, marcas y recorridos en un solo lugar.</p></div>
 
       <div className="flex gap-2">
         {(

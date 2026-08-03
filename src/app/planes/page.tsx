@@ -7,6 +7,8 @@ import PlanEditor from "@/components/PlanEditor";
 import { useAuth } from "@/context/AuthContext";
 import { deletePlan, updatePlan, usePlans } from "@/lib/db";
 import type { Plan } from "@/lib/types";
+import PageHero from "@/components/PageHero";
+import Icon from "@/components/Icon";
 
 export default function PlanesPage() {
   return (
@@ -40,12 +42,7 @@ function Planes() {
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Planes de entrenamiento</h1>
-        <button onClick={() => setEditing((e) => !e)} className="btn-primary">
-          {editing ? "Cancelar" : "+ Nuevo plan"}
-        </button>
-      </div>
+      <PageHero eyebrow="Organiza tu progreso" title="Planes de entrenamiento" description="Construye una semana equilibrada, llega al gimnasio con todo preparado y entrena sin improvisar." image="/images/training-plan.webp" action={<button onClick={() => setEditing((e) => !e)} className="btn-primary"><Icon name="calendar" className="h-4 w-4" />{editing ? "Cancelar" : "Crear nuevo plan"}</button>} />
 
       {editing && <PlanEditor onSaved={() => setEditing(false)} />}
 
@@ -53,7 +50,7 @@ function Planes() {
         <p className="text-sm text-slate-400">Cargando…</p>
       ) : plans.length === 0 && !editing ? (
         <div className="card text-center">
-          <p className="text-4xl">🗓️</p>
+          <Icon name="calendar" className="mx-auto h-10 w-10 text-accent" />
           <p className="mt-2 font-medium">Aún no tienes ningún plan</p>
           <p className="mt-1 text-sm text-slate-400">
             Crea tu rutina semanal: días de gimnasio, cardio y descanso. Después
@@ -96,7 +93,7 @@ function Planes() {
                 <div key={di} className="rounded-xl border border-base-700/60 bg-base-800/50 p-3">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold">
-                      {day.type === "descanso" ? "😴" : day.type === "cardio" ? "🏃" : "🏋️"}{" "}
+                      <span className="mr-1 inline-flex align-middle text-accent">{day.type === "cardio" ? <Icon name="run" className="h-4 w-4" /> : day.type === "gym" ? <Icon name="dumbbell" className="h-4 w-4" /> : <Icon name="clock" className="h-4 w-4" />}</span>{" "}
                       {day.name}
                     </p>
                     {day.type === "gym" && day.exercises.length > 0 && (
