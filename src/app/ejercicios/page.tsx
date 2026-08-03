@@ -66,7 +66,7 @@ function Ejercicios() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <div><p className="section-kicker">Técnica y movimiento</p><h1 className="text-3xl font-extrabold tracking-tight">Biblioteca de ejercicios</h1><p className="mt-1 text-sm text-slate-400">{loading ? "Cargando ejercicios…" : `${all.length.toLocaleString("es-ES")} ejercicios con imágenes y técnica animada`}</p></div>
+        <div><p className="section-kicker">Técnica y movimiento</p><h1 className="text-3xl font-extrabold tracking-tight">Biblioteca de ejercicios</h1><p className="mt-1 text-sm text-slate-400">{loading ? "Cargando ejercicios…" : `${all.length.toLocaleString("es-ES")} ejercicios con GIF y técnica animada`}</p></div>
         <button onClick={() => setShowForm((s) => !s)} className="btn-primary">
           {showForm ? "Cancelar" : "+ Crear"}
         </button>
@@ -143,7 +143,8 @@ function Ejercicios() {
         {filtered.map((e, i) => (
           <button key={`${e.id ?? e.name}-${i}`} onClick={() => setDetail(e)} className="exercise-card card press group overflow-hidden !p-0 text-left transition hover:-translate-y-0.5 hover:border-accent/40">
             <div className="relative aspect-square overflow-hidden bg-white">
-              <ExerciseImage media={e.media} alt={e.name} className="h-full w-full transition-transform duration-300 group-hover:scale-105" />
+              <ExerciseImage media={e.media} alt={e.name} alwaysAnimate className="h-full w-full transition-transform duration-300 group-hover:scale-105" />
+              {e.media && <span className="absolute bottom-2 left-2 chip bg-black/65 text-[10px] uppercase tracking-wide text-white backdrop-blur">GIF</span>}
               {e.custom && <span className="absolute right-2 top-2 chip bg-accent/90 text-[10px] text-base-950">propio</span>}
             </div>
             <div className="p-3">
