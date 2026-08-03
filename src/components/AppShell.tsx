@@ -7,12 +7,18 @@ import type { ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Icon, { type IconName } from "@/components/Icon";
 
-const NAV: { href: string; label: string; icon: IconName }[] = [
+const MOBILE_NAV: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Inicio", icon: "home" },
-  { href: "/entrenar", label: "Entrenar", icon: "dumbbell" },
+  { href: "/entrenar", label: "Guiado", icon: "spark" },
+  { href: "/entrenar/manual", label: "Manual", icon: "dumbbell" },
+  { href: "/perfil", label: "Perfil", icon: "user" },
+];
+
+const DESKTOP_NAV: { href: string; label: string; icon: IconName }[] = [
+  ...MOBILE_NAV.slice(0, 3),
   { href: "/planes", label: "Planes", icon: "calendar" },
   { href: "/progreso", label: "Progreso", icon: "chart" },
-  { href: "/perfil", label: "Perfil", icon: "user" },
+  MOBILE_NAV[3],
 ];
 
 const SECONDARY_NAV: { href: string; label: string; icon: IconName }[] = [
@@ -30,6 +36,12 @@ function Logo() {
       </span>
     </div>
   );
+}
+
+function isNavActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  if (href === "/entrenar") return pathname === "/entrenar";
+  return pathname.startsWith(href);
 }
 
 function LoginScreen() {
@@ -107,9 +119,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <div className="mb-6 px-2 pt-2">
           <Logo />
         </div>
-        {NAV.map((item) => {
-          const active =
-            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+        {DESKTOP_NAV.map((item) => {
+          const active = isNavActive(pathname, item.href);
           return (
             <Link
               key={item.href}
@@ -155,9 +166,8 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
         {/* Navegación inferior en móvil */}
         <nav className="app-mobile-nav fixed inset-x-0 bottom-0 z-40 flex justify-around border-t border-base-700/60 pt-2 md:hidden">
-          {NAV.map((item) => {
-            const active =
-              item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+          {MOBILE_NAV.map((item) => {
+            const active = isNavActive(pathname, item.href);
             return (
               <Link
                 key={item.href}
