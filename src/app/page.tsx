@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import Link from "next/link";
@@ -5,6 +6,8 @@ import AppShell from "@/components/AppShell";
 import StatCard from "@/components/StatCard";
 import WorkoutCard from "@/components/WorkoutCard";
 import WeeklyChart from "@/components/WeeklyChart";
+import PageHero from "@/components/PageHero";
+import Icon from "@/components/Icon";
 import { useAuth } from "@/context/AuthContext";
 import { useGoals, useWorkouts, useBodyMetrics } from "@/lib/db";
 import {
@@ -42,19 +45,13 @@ function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">Hola, {firstName} 👋</h1>
-          <p className="text-sm text-slate-400">
-            {thisWeek.length > 0
-              ? `Llevas ${thisWeek.length} ${thisWeek.length === 1 ? "sesión" : "sesiones"} esta semana. ¡Sigue así!`
-              : "Aún no has entrenado esta semana. ¡Hoy es un buen día!"}
-          </p>
-        </div>
-        <Link href="/entrenar" className="btn-primary shrink-0">
-          + Entrenar
-        </Link>
-      </div>
+      <PageHero
+        eyebrow="Tu panel de rendimiento"
+        title={`Hola, ${firstName}`}
+        description={thisWeek.length > 0 ? `Ya llevas ${thisWeek.length} ${thisWeek.length === 1 ? "sesión" : "sesiones"} esta semana. Mantén el ritmo y supera tu mejor versión.` : "Tu próxima mejora empieza hoy. Registra una sesión y convierte cada entrenamiento en progreso medible."}
+        image="/images/fitness-hero.webp"
+        action={<Link href="/entrenar" className="btn-primary px-5 py-3"><Icon name="dumbbell" className="h-4 w-4" /> Empezar entrenamiento</Link>}
+      />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <StatCard
@@ -80,9 +77,30 @@ function Dashboard() {
         />
       </div>
 
+      <section>
+        <div className="mb-3 flex items-end justify-between">
+          <div><p className="section-kicker">Acceso rápido</p><h2 className="section-title">¿Qué quieres entrenar hoy?</h2></div>
+          <Link href="/planes" className="text-xs font-semibold text-accent hover:underline">Ver mi plan →</Link>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Link href="/entrenar" className="media-card">
+            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/strength-training.webp`} alt="Entrenamiento de fuerza" />
+            <div className="media-card-content"><span className="chip bg-gym/20 text-gym">Fuerza</span><h3 className="mt-2 text-xl font-bold">Gimnasio</h3><p className="text-sm text-slate-300">Series, pesos y descansos en vivo</p></div>
+          </Link>
+          <Link href="/entrenar" className="media-card">
+            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/cardio-running.webp`} alt="Entrenamiento de cardio" />
+            <div className="media-card-content"><span className="chip bg-cardio/20 text-cardio">Cardio</span><h3 className="mt-2 text-xl font-bold">Salir a entrenar</h3><p className="text-sm text-slate-300">Distancia, ritmo, pulso y ruta</p></div>
+          </Link>
+          <Link href="/planes" className="media-card">
+            <img src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/images/training-plan.webp`} alt="Planificación de entrenamiento" />
+            <div className="media-card-content"><span className="chip bg-accent/20 text-accent">Planificación</span><h3 className="mt-2 text-xl font-bold">Mi semana</h3><p className="text-sm text-slate-300">Organiza sesiones y objetivos</p></div>
+          </Link>
+        </div>
+      </section>
+
       {workouts.length > 0 && (
         <div className="card">
-          <h2 className="mb-3 font-semibold">Actividad de las últimas 8 semanas</h2>
+          <p className="section-kicker">Tendencia</p><h2 className="mb-3 section-title">Actividad de las últimas 8 semanas</h2>
           <WeeklyChart data={series} />
         </div>
       )}
@@ -90,7 +108,7 @@ function Dashboard() {
       {goals.length > 0 && (
         <div>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="font-semibold">🎯 Objetivos</h2>
+            <h2 className="section-title flex items-center gap-2"><Icon name="target" className="h-5 w-5 text-accent" />Objetivos</h2>
             <Link href="/progreso" className="text-xs text-accent hover:underline">
               Ver todos
             </Link>
@@ -123,7 +141,7 @@ function Dashboard() {
 
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold">Últimos entrenamientos</h2>
+          <h2 className="section-title">Últimos entrenamientos</h2>
           {workouts.length > 6 && (
             <Link href="/historial" className="text-xs text-accent hover:underline">
               Ver historial completo

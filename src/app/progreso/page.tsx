@@ -14,6 +14,7 @@ import {
   personalRecords,
 } from "@/lib/stats";
 import type { GoalType } from "@/lib/types";
+import Icon from "@/components/Icon";
 
 export default function ProgresoPage() {
   return (
@@ -70,12 +71,12 @@ function Progreso() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Progreso</h1>
+      <div className="rounded-[1.75rem] border border-base-700/60 bg-gradient-to-br from-accent/15 via-base-900 to-base-900 p-6 md:p-8"><p className="section-kicker">Datos que te hacen mejor</p><div className="mt-1 flex items-end justify-between gap-4"><div><h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">Tu progreso</h1><p className="mt-2 max-w-xl text-sm text-slate-400">Analiza tu evolución, celebra nuevos récords y mantén tus objetivos siempre a la vista.</p></div><Icon name="chart" className="hidden h-16 w-16 text-accent/60 sm:block" /></div></div>
 
       {/* Evolución por ejercicio */}
       <div className="card">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="font-semibold">📈 Evolución por ejercicio</h2>
+          <h2 className="section-title flex items-center gap-2"><Icon name="chart" className="h-5 w-5 text-accent" />Evolución por ejercicio</h2>
           {exerciseNames.length > 0 && (
             <select
               className="input max-w-[220px] !py-1.5"
@@ -102,7 +103,7 @@ function Progreso() {
 
       {/* Récords personales */}
       <div>
-        <h2 className="mb-3 font-semibold">🏆 Récords personales</h2>
+        <h2 className="mb-3 section-title">Récords personales</h2>
         {prs.length === 0 ? (
           <p className="text-sm text-slate-400">
             Tus mejores marcas por ejercicio aparecerán aquí automáticamente.
@@ -128,7 +129,7 @@ function Progreso() {
       {/* Objetivos */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-semibold">🎯 Objetivos</h2>
+          <h2 className="section-title flex items-center gap-2"><Icon name="target" className="h-5 w-5 text-accent" />Objetivos</h2>
           <button onClick={() => setShowGoalForm((s) => !s)} className="btn-primary !py-1.5 !text-xs">
             {showGoalForm ? "Cancelar" : "+ Nuevo objetivo"}
           </button>

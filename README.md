@@ -1,4 +1,4 @@
-# 💪 RCV Tracker
+# VizFitness
 
 Aplicación de seguimiento de entrenamiento estilo Strava, pero completa:
 **cardio + gimnasio + planes de entrenamiento**, con inicio de sesión con

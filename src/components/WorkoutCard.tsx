@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import type { Workout } from "@/lib/types";
-import { CARDIO_SPORTS } from "@/lib/types";
 import { formatDateShort, formatDuration, pace } from "@/lib/stats";
 import { useAuth } from "@/context/AuthContext";
 import { deleteWorkout } from "@/lib/db";
 import RouteMap from "./RouteMap";
+import Icon from "./Icon";
 
 export default function WorkoutCard({ workout }: { workout: Workout }) {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const isCardio = workout.type === "cardio";
-  const sport = CARDIO_SPORTS.find((s) => s.value === workout.cardio?.sport);
 
   const remove = async () => {
     if (!user || !workout.id) return;
@@ -21,13 +20,13 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
   };
 
   return (
-    <div className="card">
+    <div className="card transition hover:border-base-600/80">
       <button
         className="flex w-full items-start justify-between gap-3 text-left"
         onClick={() => setOpen((o) => !o)}
       >
         <div className="flex items-start gap-3">
-          <span className="text-2xl">{isCardio ? sport?.emoji ?? "🏃" : "🏋️"}</span>
+          <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${isCardio ? "bg-cardio/15 text-cardio" : "bg-gym/15 text-gym"}`}><Icon name={isCardio ? "run" : "dumbbell"} className="h-5 w-5" /></span>
           <div>
             <p className="font-semibold">{workout.name}</p>
             <p className="text-xs text-slate-400">
@@ -54,19 +53,19 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
       <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-300">
         {isCardio && workout.cardio ? (
           <>
-            <span>📏 {workout.cardio.distanceKm} km</span>
-            <span>⚡ {pace(workout.durationMin, workout.cardio.distanceKm)}</span>
-            {workout.cardio.avgHr ? <span>❤️ {workout.cardio.avgHr} ppm</span> : null}
-            {workout.cardio.calories ? <span>🔥 {workout.cardio.calories} kcal</span> : null}
+            <span>{workout.cardio.distanceKm} km</span>
+            <span>{pace(workout.durationMin, workout.cardio.distanceKm)}</span>
+            {workout.cardio.avgHr ? <span>{workout.cardio.avgHr} ppm</span> : null}
+            {workout.cardio.calories ? <span className="inline-flex items-center gap-1"><Icon name="fire" className="h-3.5 w-3.5 text-cardio" />{workout.cardio.calories} kcal</span> : null}
           </>
         ) : (
           <>
-            <span>💪 {workout.exercises?.length ?? 0} ejercicios</span>
+            <span>{workout.exercises?.length ?? 0} ejercicios</span>
             <span>
-              📊 {workout.exercises?.reduce((a, e) => a + e.sets.length, 0) ?? 0} series
+              {workout.exercises?.reduce((a, e) => a + e.sets.length, 0) ?? 0} series
             </span>
             {workout.volumeKg ? (
-              <span>🏆 {Math.round(workout.volumeKg).toLocaleString("es-ES")} kg totales</span>
+              <span className="font-semibold text-accent">{Math.round(workout.volumeKg).toLocaleString("es-ES")} kg totales</span>
             ) : null}
           </>
         )}
