@@ -108,6 +108,7 @@ export interface Workout {
   createdAt: number;
   profileId?: string;
   profileName?: string;
+  wod?: WodResult;
 }
 
 export type ProfileSex = "mujer" | "hombre" | "otro";
@@ -137,6 +138,23 @@ export interface TrainingProfile {
 
 export type TrainingPlace = "gimnasio" | "casa" | "exterior";
 export type TrainingFocus = "musculacion" | "cardio" | "mixto";
+export type SessionFormat = "clasico" | "for-time" | "amrap" | "emom" | "tabata" | "hyrox";
+
+export interface WodStation {
+  name: string;
+  workSec: number;
+  restSec: number;
+  target: string;
+  muscleGroup?: MuscleGroup;
+}
+
+export interface WodResult {
+  format: Exclude<SessionFormat, "clasico">;
+  roundsPlanned: number;
+  roundsCompleted: number;
+  elapsedSec: number;
+  stations: WodStation[];
+}
 
 export interface SessionPreferences {
   profileId?: string;
@@ -149,6 +167,7 @@ export interface SessionPreferences {
   durationMin: number;
   equipment: string[];
   energy: "baja" | "normal" | "alta";
+  format: SessionFormat;
 }
 
 export interface GeneratedSession {
@@ -161,6 +180,8 @@ export interface GeneratedSession {
   rounds?: number;
   profileId?: string;
   profileName: string;
+  format: SessionFormat;
+  stations?: WodStation[];
 }
 
 export interface PlanExercise {

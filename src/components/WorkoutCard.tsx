@@ -47,7 +47,7 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
             isCardio ? "bg-cardio/15 text-cardio" : "bg-gym/15 text-gym"
           }`}
         >
-          {isCardio ? "Cardio" : "Gimnasio"}
+          {workout.wod ? workout.wod.format.toUpperCase() : isCardio ? "Cardio" : "Gimnasio"}
         </span>
       </button>
 
@@ -58,6 +58,12 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
             <span>{pace(workout.durationMin, workout.cardio.distanceKm)}</span>
             {workout.cardio.avgHr ? <span>{workout.cardio.avgHr} ppm</span> : null}
             {workout.cardio.calories ? <span className="inline-flex items-center gap-1"><Icon name="fire" className="h-3.5 w-3.5 text-cardio" />{workout.cardio.calories} kcal</span> : null}
+          </>
+        ) : workout.wod ? (
+          <>
+            <span className="font-semibold text-accent">{workout.wod.roundsCompleted} rondas</span>
+            <span>{Math.floor(workout.wod.elapsedSec / 60)}:{String(workout.wod.elapsedSec % 60).padStart(2, "0")}</span>
+            <span>{workout.wod.stations.length} estaciones</span>
           </>
         ) : (
           <>
@@ -79,7 +85,9 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
               <RouteMap route={workout.cardio!.route!} />
             </div>
           )}
-          {!isCardio && workout.exercises && (
+          {workout.wod ? (
+            <div><p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Resultado del WOD</p><ul className="space-y-1 text-sm text-slate-300">{workout.wod.stations.map((station, index) => <li key={`${station.name}-${index}`}>{index + 1}. {station.name} · <span className="text-slate-500">{station.target}</span></li>)}</ul></div>
+          ) : !isCardio && workout.exercises && (
             <ul className="space-y-2 text-sm">
               {workout.exercises.map((ex, i) => (
                 <li key={i}>
