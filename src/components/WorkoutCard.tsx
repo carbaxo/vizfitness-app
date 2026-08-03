@@ -39,6 +39,7 @@ export default function WorkoutCard({ workout }: { workout: Workout }) {
                     ? " · 📁 GPX"
                     : ""}
             </p>
+            {workout.profileName && <span className="mt-1 inline-flex chip bg-accent/10 text-accent">{workout.profileName}</span>}
           </div>
         </div>
         <span

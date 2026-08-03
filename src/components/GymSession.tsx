@@ -6,11 +6,11 @@ import { useAuth } from "@/context/AuthContext";
 import { addWorkout, useCustomExercises, usePlans } from "@/lib/db";
 import { useExerciseLibrary } from "@/lib/exerciseLibrary";
 import { isoDate, workoutVolumeKg } from "@/lib/stats";
-import type { SetEntry, Workout, WorkoutExercise } from "@/lib/types";
+import type { GeneratedSession, SetEntry, Workout, WorkoutExercise } from "@/lib/types";
 import RestTimer from "./RestTimer";
 import ExerciseImage from "./ExerciseImage";
 
-export default function GymSession() {
+export default function GymSession({ initialSession }: { initialSession?: GeneratedSession }) {
   const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -18,9 +18,9 @@ export default function GymSession() {
   const { library } = useExerciseLibrary();
   const { data: plans } = usePlans();
 
-  const [name, setName] = useState("Sesión de gimnasio");
-  const [exercises, setExercises] = useState<WorkoutExercise[]>([]);
-  const [notes, setNotes] = useState("");
+  const [name, setName] = useState(initialSession?.name ?? "Sesión de gimnasio");
+  const [exercises, setExercises] = useState<WorkoutExercise[]>(() => initialSession?.exercises ?? []);
+  const [notes, setNotes] = useState(initialSession?.description ?? "");
   const [startedAt] = useState(() => Date.now());
   const [elapsed, setElapsed] = useState(0);
   const [picker, setPicker] = useState(false);
@@ -123,6 +123,8 @@ export default function GymSession() {
         exercises: cleaned,
         createdAt: Date.now(),
       };
+      if (initialSession?.profileId) workout.profileId = initialSession.profileId;
+      if (initialSession?.profileName) workout.profileName = initialSession.profileName;
       if (notes.trim()) workout.notes = notes.trim();
       workout.volumeKg = workoutVolumeKg(workout as Workout);
       await addWorkout(user.uid, workout);
