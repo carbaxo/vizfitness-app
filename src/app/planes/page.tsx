@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import PlanEditor from "@/components/PlanEditor";
+import RoutineTemplates from "@/components/RoutineTemplates";
+import ExerciseEditSheet from "@/components/ExerciseEditSheet";
 import { useAuth } from "@/context/AuthContext";
 import { deletePlan, updatePlan, usePlans } from "@/lib/db";
 import type { Plan } from "@/lib/types";
@@ -22,6 +24,34 @@ function Planes() {
   const { user } = useAuth();
   const { data: plans, loading } = usePlans();
   const [editing, setEditing] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [editingEx, setEditingEx] = useState<{ planId: string; di: number; ei: number } | null>(null);
+
+  const openExName = editingEx
+    ? plans.find((plan) => plan.id === editingEx.planId)?.days[editingEx.di]?.exercises[editingEx.ei]?.name
+    : undefined;
+
+  const replaceEx = async (newName: string) => {
+    if (!user || !editingEx) return;
+    const plan = plans.find((item) => item.id === editingEx.planId);
+    if (!plan?.id) return;
+    const days = plan.days.map((day, di) => di !== editingEx.di ? day : {
+      ...day,
+      exercises: day.exercises.map((exercise, ei) => ei !== editingEx.ei ? exercise : { ...exercise, name: newName }),
+    });
+    await updatePlan(user.uid, plan.id, { days });
+  };
+
+  const removeEx = async () => {
+    if (!user || !editingEx) return;
+    const plan = plans.find((item) => item.id === editingEx.planId);
+    if (!plan?.id) return;
+    const days = plan.days.map((day, di) => di !== editingEx.di ? day : {
+      ...day,
+      exercises: day.exercises.filter((_, ei) => ei !== editingEx.ei),
+    });
+    await updatePlan(user.uid, plan.id, { days });
+  };
 
   const setActive = async (plan: Plan) => {
     if (!user || !plan.id) return;
@@ -42,20 +72,28 @@ function Planes() {
 
   return (
     <div className="space-y-5">
-      <PageHero eyebrow="Organiza tu progreso" title="Planes de entrenamiento" description="Construye una semana equilibrada, llega al gimnasio con todo preparado y entrena sin improvisar." image="/images/training-plan.webp" action={<button onClick={() => setEditing((e) => !e)} className="btn-primary"><Icon name="calendar" className="h-4 w-4" />{editing ? "Cancelar" : "Crear nuevo plan"}</button>} />
+      <PageHero eyebrow="Organiza tu progreso" title="Planes de entrenamiento" description="Construye una semana equilibrada, llega al gimnasio con todo preparado y entrena sin improvisar." image="/images/training-plan.webp" action={<div className="flex flex-wrap gap-2"><button onClick={() => { setShowTemplates((value) => !value); setEditing(false); }} className="btn-secondary">{showTemplates ? "Ocultar" : "Ver plantillas"}</button><button onClick={() => { setEditing((value) => !value); setShowTemplates(false); }} className="btn-primary"><Icon name="calendar" className="h-4 w-4" />{editing ? "Cancelar" : "Crear plan"}</button></div>} />
 
       {editing && <PlanEditor onSaved={() => setEditing(false)} />}
 
+      {showTemplates && (
+        <section className="space-y-3">
+          <div><p className="section-kicker">Rutinas listas para usar</p><h2 className="section-title">Elige, personaliza y empieza</h2></div>
+          <RoutineTemplates onAdded={() => setShowTemplates(false)} />
+        </section>
+      )}
+
       {loading ? (
         <p className="text-sm text-slate-400">Cargando…</p>
-      ) : plans.length === 0 && !editing ? (
+      ) : plans.length === 0 && !editing && !showTemplates ? (
         <div className="card text-center">
           <Icon name="calendar" className="mx-auto h-10 w-10 text-accent" />
           <p className="mt-2 font-medium">Aún no tienes ningún plan</p>
           <p className="mt-1 text-sm text-slate-400">
-            Crea tu rutina semanal: días de gimnasio, cardio y descanso. Después
-            podrás iniciar cada sesión con un toque.
+            Empieza con una rutina prediseñada o crea la tuya con días de gimnasio,
+            cardio y descanso.
           </p>
+          <button onClick={() => setShowTemplates(true)} className="btn-primary mx-auto mt-4">Ver plantillas</button>
         </div>
       ) : (
         plans.map((plan) => (
@@ -110,7 +148,9 @@ function Planes() {
                     <ul className="mt-2 space-y-0.5 text-xs text-slate-400">
                       {day.exercises.map((e, i) => (
                         <li key={i}>
-                          {e.name} — {e.sets}×{e.reps}
+                          <button onClick={() => setEditingEx({ planId: plan.id!, di, ei: i })} className="press flex w-full items-center justify-between gap-2 rounded-lg py-1 text-left hover:text-slate-200">
+                            <span className="min-w-0 truncate">{e.name} — {e.sets}×{e.reps}</span><span aria-hidden>›</span>
+                          </button>
                         </li>
                       ))}
                     </ul>
@@ -123,6 +163,10 @@ function Planes() {
             </div>
           </div>
         ))
+      )}
+
+      {editingEx && openExName && (
+        <ExerciseEditSheet name={openExName} onClose={() => setEditingEx(null)} onReplace={replaceEx} onRemove={removeEx} />
       )}
     </div>
   );

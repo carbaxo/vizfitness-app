@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" role="img" aria-label="VizFitness">
+  <defs>
+    <linearGradient id="viz-fitness-mark" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffae6b"/>
+      <stop offset="0.48" stop-color="#fb7a29"/>
+      <stop offset="1" stop-color="#a83909"/>
+    </linearGradient>
+  </defs>
+  <rect width="108" height="108" rx="23.76" fill="url(#viz-fitness-mark)"/>
+  <path fill="#fffaf5" d="M30.02,34.02 L54,76.03 L54,53.32 L42.98,34.02 Z"/>
+  <path fill="#ffe0c2" d="M77.98,34.02 L54,76.03 L54,53.32 L65.02,34.02 Z"/>
+</svg>
