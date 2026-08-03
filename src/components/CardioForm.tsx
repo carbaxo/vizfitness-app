@@ -5,19 +5,19 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { addWorkout } from "@/lib/db";
 import { isoDate, pace } from "@/lib/stats";
-import { CARDIO_SPORTS, type CardioSport, type Workout } from "@/lib/types";
+import { CARDIO_SPORTS, type CardioSport, type GeneratedSession, type Workout } from "@/lib/types";
 
-export default function CardioForm() {
+export default function CardioForm({ initialSession }: { initialSession?: GeneratedSession }) {
   const { user } = useAuth();
   const router = useRouter();
   const [sport, setSport] = useState<CardioSport>("correr");
   const [date, setDate] = useState(isoDate(new Date()));
   const [distance, setDistance] = useState("");
-  const [duration, setDuration] = useState("");
+  const [duration, setDuration] = useState(initialSession ? String(initialSession.durationMin) : "");
   const [avgHr, setAvgHr] = useState("");
   const [calories, setCalories] = useState("");
   const [elevation, setElevation] = useState("");
-  const [notes, setNotes] = useState("");
+  const [notes, setNotes] = useState(initialSession?.description ?? "");
   const [saving, setSaving] = useState(false);
 
   const distanceKm = parseFloat(distance) || 0;
@@ -42,6 +42,8 @@ export default function CardioForm() {
         },
         createdAt: Date.now(),
       };
+      if (initialSession?.profileId) workout.profileId = initialSession.profileId;
+      if (initialSession?.profileName) workout.profileName = initialSession.profileName;
       if (notes.trim()) workout.notes = notes.trim();
       await addWorkout(user.uid, workout);
       router.push("/");

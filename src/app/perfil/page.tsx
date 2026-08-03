@@ -10,10 +10,12 @@ import {
   useBodyMetrics,
   useGoals,
   usePlans,
+  useTrainingProfiles,
   useWorkouts,
 } from "@/lib/db";
 import { formatDateShort, isoDate } from "@/lib/stats";
 import Icon from "@/components/Icon";
+import TrainingProfiles from "@/components/TrainingProfiles";
 
 export default function PerfilPage() {
   return (
@@ -29,6 +31,7 @@ function Perfil() {
   const { data: workouts } = useWorkouts();
   const { data: plans } = usePlans();
   const { data: goals } = useGoals();
+  const { data: trainingProfiles } = useTrainingProfiles();
 
   const [weight, setWeight] = useState("");
   const [date, setDate] = useState(isoDate(new Date()));
@@ -50,6 +53,7 @@ function Perfil() {
       entrenamientos: workouts,
       planes: plans,
       objetivos: goals,
+      perfilesDeEntrenamiento: trainingProfiles,
       pesoCorporal: metrics,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -89,6 +93,8 @@ function Perfil() {
           </p>
         </div>
       </div>
+
+      <TrainingProfiles />
 
       <div className="card space-y-3">
         <h2 className="section-title">Peso corporal</h2>
@@ -137,7 +143,7 @@ function Perfil() {
         <h2 className="section-title">Tus datos</h2>
         <p className="text-sm text-slate-400">
           {workouts.length} entrenamientos · {plans.length} planes · {goals.length}{" "}
-          objetivos · {metrics.length} registros de peso
+          objetivos · {trainingProfiles.length} perfiles · {metrics.length} registros de peso
         </p>
         <button onClick={exportData} className="btn-secondary">
           <Icon name="arrow" className="h-4 w-4 rotate-90" /> Exportar todos mis datos (JSON)

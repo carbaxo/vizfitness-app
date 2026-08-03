@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { getDb } from "./firebase";
 import { useAuth } from "@/context/AuthContext";
-import type { BodyMetric, Exercise, Goal, Plan, Workout } from "./types";
+import type { BodyMetric, Exercise, Goal, Plan, TrainingProfile, Workout } from "./types";
 
 // Todos los datos viven bajo users/{uid}/... — cada usuario solo ve lo suyo
 // (reforzado por las reglas de seguridad de Firestore en firestore.rules).
@@ -64,6 +64,7 @@ export const useCustomExercises = () => useUserCollection<Exercise>("exercises",
 export const usePlans = () => useUserCollection<Plan>("plans");
 export const useGoals = () => useUserCollection<Goal>("goals");
 export const useBodyMetrics = () => useUserCollection<BodyMetric>("metrics", "date");
+export const useTrainingProfiles = () => useUserCollection<TrainingProfile>("trainingProfiles", "createdAt", "asc");
 
 type WithoutId<T> = Omit<T, "id">;
 
@@ -110,4 +111,16 @@ export async function addBodyMetric(uid: string, m: WithoutId<BodyMetric>) {
 
 export async function deleteBodyMetric(uid: string, id: string) {
   return deleteDoc(doc(getDb(), "users", uid, "metrics", id));
+}
+
+export async function addTrainingProfile(uid: string, profile: WithoutId<TrainingProfile>) {
+  return addDoc(userCol(uid, "trainingProfiles"), profile);
+}
+
+export async function updateTrainingProfile(uid: string, id: string, profile: Partial<TrainingProfile>) {
+  return updateDoc(doc(getDb(), "users", uid, "trainingProfiles", id), profile);
+}
+
+export async function deleteTrainingProfile(uid: string, id: string) {
+  return deleteDoc(doc(getDb(), "users", uid, "trainingProfiles", id));
 }
