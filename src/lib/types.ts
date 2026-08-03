@@ -182,6 +182,7 @@ export interface GeneratedSession {
   profileName: string;
   format: SessionFormat;
   stations?: WodStation[];
+  preferences: SessionPreferences;
 }
 
 export interface PlanExercise {
